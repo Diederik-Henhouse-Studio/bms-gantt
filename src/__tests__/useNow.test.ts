@@ -29,7 +29,7 @@ describe('useNow', () => {
   });
 
   it('cleans up the interval on unmount', () => {
-    const clear = vi.spyOn(global, 'clearInterval');
+    const clear = vi.spyOn(globalThis, 'clearInterval');
     const { unmount } = renderHook(() => useNow(1000));
     unmount();
     expect(clear).toHaveBeenCalled();
