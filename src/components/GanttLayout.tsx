@@ -147,6 +147,23 @@ export function GanttLayout({
         e.preventDefault();
         useGanttStore.getState().redo();
       }
+      // Delete selected tasks (ignore when focus is in an editable input).
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        const target = e.target as HTMLElement | null;
+        if (
+          target &&
+          (target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable)
+        ) {
+          return;
+        }
+        const state = useGanttStore.getState();
+        if (state.selectedTaskIds.length > 0) {
+          e.preventDefault();
+          state.removeTasks(state.selectedTaskIds);
+        }
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown);

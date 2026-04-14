@@ -266,6 +266,53 @@ const ganttStateCreator: StateCreator<GanttState> = (set, get) => {
       recalculate();
     },
 
+    /**
+     * Bulk remove multiple tasks (and their descendants) in a single action.
+     * Produces one undo entry regardless of how many tasks are removed.
+     */
+    removeTasks(ids: string[]) {
+      if (ids.length === 0) return;
+      set((s) => {
+        const removeIds = new Set<string>();
+        for (const id of ids) {
+          removeIds.add(id);
+          for (const d of getAllDescendants(s.tasks, id)) removeIds.add(d.id);
+        }
+        return {
+          tasks: s.tasks.filter((t) => !removeIds.has(t.id)),
+          links: s.links.filter(
+            (l) => !removeIds.has(l.source) && !removeIds.has(l.target),
+          ),
+          selectedTaskIds: s.selectedTaskIds.filter((id) => !removeIds.has(id)),
+        };
+      });
+      recalculate();
+    },
+
+    /**
+     * Shift multiple tasks by `deltaDays` calendar days in a single action.
+     * Skips tasks with `lockStart` or `lockEnd`.
+     */
+    shiftTasks(ids: string[], deltaDays: number) {
+      if (ids.length === 0 || deltaDays === 0) return;
+      const MS = 1000 * 60 * 60 * 24;
+      set((s) => {
+        const idSet = new Set(ids);
+        return {
+          tasks: s.tasks.map((t) => {
+            if (!idSet.has(t.id)) return t;
+            if (t.lockStart || t.lockEnd) return t;
+            return {
+              ...t,
+              start: new Date(t.start.getTime() + deltaDays * MS),
+              end: new Date(t.end.getTime() + deltaDays * MS),
+            };
+          }),
+        };
+      });
+      recalculate();
+    },
+
     toggleTaskOpen(id: string) {
       set((s) => ({
         tasks: s.tasks.map((t) =>

@@ -3,8 +3,9 @@
 // Renders stacked date-cell rows for the timeline header.
 // ─────────────────────────────────────────────────────────────
 
-import React, { memo } from 'react';
+import React from 'react';
 import type { ScaleCell } from '../store/types';
+import { useSlots } from '../slots';
 
 export interface TimeScaleProps {
   /** 2D array of header cells — one inner array per scale level (top to bottom). */
@@ -17,8 +18,8 @@ export interface TimeScaleProps {
  * Timeline header rendered above the chart area.
  * Sticky-positioned so it stays visible during vertical scroll.
  */
-export const TimeScale: React.FC<TimeScaleProps> = memo(
-  ({ scaleCells, totalWidth }) => {
+export const TimeScale: React.FC<TimeScaleProps> = ({ scaleCells, totalWidth }) => {
+    const { renderHeaderCell } = useSlots();
     const rowCount = scaleCells.length;
 
     return (
@@ -54,13 +55,14 @@ export const TimeScale: React.FC<TimeScaleProps> = memo(
                   cellClasses.push('border-b-2 border-primary');
                 }
 
+                const content = renderHeaderCell?.(cell, rowIndex) ?? cell.label;
                 return (
                   <div
                     key={cell.key}
                     className={cellClasses.join(' ')}
                     style={{ width: cell.width, minWidth: cell.width }}
                   >
-                    {cell.label}
+                    {content}
                   </div>
                 );
               })}
@@ -69,7 +71,6 @@ export const TimeScale: React.FC<TimeScaleProps> = memo(
         })}
       </div>
     );
-  },
-);
+};
 
 TimeScale.displayName = 'TimeScale';

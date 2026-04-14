@@ -327,6 +327,10 @@ const slots: GanttSlots = {
       {task.text} — {task.progress}%
     </div>
   ),
+  // Override the timeline header cell content
+  renderHeaderCell: (cell, rowIndex) => (
+    <span className={rowIndex === 0 ? 'font-mono' : ''}>{cell.label}</span>
+  ),
 };
 
 <Gantt tasks={tasks} slots={slots} />

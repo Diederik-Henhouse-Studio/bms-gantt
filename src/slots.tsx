@@ -1,6 +1,6 @@
 import { createContext, useContext, type ReactNode } from 'react';
 import type { ColumnDef } from '@tanstack/react-table';
-import type { GanttTask } from './store';
+import type { GanttTask, ScaleCell } from './store';
 
 /**
  * Customisation slots. Each field is optional; when omitted the built-in
@@ -14,6 +14,12 @@ export interface GanttSlots {
    * (the outer wrapper keeps positioning/drag handlers).
    */
   renderTaskBar?: (task: GanttTask) => ReactNode;
+  /**
+   * Override the content of a timeline header cell. Receives the cell and
+   * its row index (0 = top row). Return a ReactNode rendered in place of
+   * the default cell label.
+   */
+  renderHeaderCell?: (cell: ScaleCell, rowIndex: number) => ReactNode;
   /**
    * Custom column definitions for the left-pane grid. When omitted, the
    * built-in column set (Task / Start / End / Duration / Progress) is used.
