@@ -386,8 +386,7 @@ const ganttStateCreator: StateCreator<GanttState> = (set, get) => {
     setZoom(level: ZoomLevel) {
       const preset = ZOOM_PRESETS[level as keyof typeof ZOOM_PRESETS];
       if (!preset) {
-        // H4: foutmelding bij onbekend preset i.p.v. stille return
-        console.warn(`setZoom: onbekend zoom level "${level}", beschikbaar: ${Object.keys(ZOOM_PRESETS).join(', ')}`);
+        console.warn(`setZoom: unknown zoom level "${level}", available: ${Object.keys(ZOOM_PRESETS).join(', ')}`);
         return;
       }
 

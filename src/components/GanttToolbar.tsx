@@ -10,6 +10,7 @@ import { useGanttStore } from '../store';
 import type { ZoomLevel, GanttConfig } from '../store';
 import { dateToX } from '../store/scales';
 import { ExportButton } from './ExportButton';
+import { useLabels } from '../i18n';
 
 // ── Zoom level ordering (coarse → fine) ──────────────────────
 
@@ -20,17 +21,8 @@ const ZOOM_ORDER: ZoomLevel[] = [
   'weeks',
   'days',
   'hours',
+  'minutes',
 ];
-
-/** Dutch labels for each zoom level. */
-const ZOOM_LABELS: Record<ZoomLevel, string> = {
-  hours: 'Uren',
-  days: 'Dagen',
-  weeks: 'Weken',
-  months: 'Maanden',
-  quarters: 'Kwartalen',
-  years: 'Jaren',
-};
 
 // ── Button style ────────────────────────────────────────────
 
@@ -44,8 +36,7 @@ interface GanttToolbarProps {
 }
 
 export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
-  // ── Store selectors ─────────────────────────────────────────
-
+  const labels = useLabels();
   const zoomLevel = useGanttStore((s) => s.zoomLevel);
   const setZoom = useGanttStore((s) => s.setZoom);
   const setScroll = useGanttStore((s) => s.setScroll);
@@ -59,33 +50,22 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
 
   const currentIdx = ZOOM_ORDER.indexOf(zoomLevel);
 
-  // ── Zoom handlers ─────────────────────────────────────────
-
   const handleZoomOut = useCallback(() => {
-    if (currentIdx > 0) {
-      setZoom(ZOOM_ORDER[currentIdx - 1]);
-    }
+    if (currentIdx > 0) setZoom(ZOOM_ORDER[currentIdx - 1]);
   }, [currentIdx, setZoom]);
 
   const handleZoomIn = useCallback(() => {
-    if (currentIdx < ZOOM_ORDER.length - 1) {
-      setZoom(ZOOM_ORDER[currentIdx + 1]);
-    }
+    if (currentIdx < ZOOM_ORDER.length - 1) setZoom(ZOOM_ORDER[currentIdx + 1]);
   }, [currentIdx, setZoom]);
-
-  // ── Navigate to today ─────────────────────────────────────
 
   const handleToday = useCallback(() => {
     const todayX = dateToX(new Date(), dateRange, totalWidth);
-    // Centre today in the viewport (rough estimate: offset by half a screen width ~400px)
     const viewportOffset = 400;
     const newScrollLeft = Math.max(0, todayX - viewportOffset);
     setScroll(scrollTop, newScrollLeft);
   }, [dateRange, totalWidth, scrollTop, setScroll]);
 
-  // ── Navigation arrows (scroll by ~screen width) ───────────
-
-  const scrollStep = 600; // px per click
+  const scrollStep = 600;
 
   const handleScrollLeft = useCallback(() => {
     const newScrollLeft = Math.max(0, scrollLeft - scrollStep);
@@ -100,17 +80,14 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
     setScroll(scrollTop, newScrollLeft);
   }, [scrollLeft, scrollTop, totalWidth, setScroll]);
 
-  // ── Render ─────────────────────────────────────────────────
-
   return (
     <div className="flex items-center gap-1 px-3 py-1.5 border-b bg-muted/30">
-      {/* ── Navigation arrows ──────────────────────────────── */}
       <button
         type="button"
         className={btnClass}
         onClick={handleScrollLeft}
-        title="Scroll naar links"
-        aria-label="Scroll naar links"
+        title={labels.scrollLeft}
+        aria-label={labels.scrollLeft}
       >
         &#x25C0;
       </button>
@@ -118,29 +95,27 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
         type="button"
         className={btnClass}
         onClick={handleScrollRight}
-        title="Scroll naar rechts"
-        aria-label="Scroll naar rechts"
+        title={labels.scrollRight}
+        aria-label={labels.scrollRight}
       >
         &#x25B6;
       </button>
 
-      {/* ── Divider ────────────────────────────────────────── */}
       <div className="w-px h-5 bg-border mx-1" />
 
-      {/* ── Zoom controls ──────────────────────────────────── */}
       <button
         type="button"
         className={btnClass}
         onClick={handleZoomOut}
         disabled={currentIdx <= 0}
-        title="Zoom uit"
-        aria-label="Zoom uit"
+        title={labels.zoomOut}
+        aria-label={labels.zoomOut}
       >
         &minus;
       </button>
 
       <span className="text-xs font-medium px-1.5 min-w-[4.5rem] text-center select-none">
-        {ZOOM_LABELS[zoomLevel] ?? zoomLevel}
+        {labels.zoomLevels[zoomLevel] ?? zoomLevel}
       </span>
 
       <button
@@ -148,36 +123,32 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
         className={btnClass}
         onClick={handleZoomIn}
         disabled={currentIdx >= ZOOM_ORDER.length - 1}
-        title="Zoom in"
-        aria-label="Zoom in"
+        title={labels.zoomIn}
+        aria-label={labels.zoomIn}
       >
         +
       </button>
 
-      {/* ── Divider ────────────────────────────────────────── */}
       <div className="w-px h-5 bg-border mx-1" />
 
-      {/* ── Today button ───────────────────────────────────── */}
       <button
         type="button"
         className={btnClass}
         onClick={handleToday}
-        title="Ga naar vandaag"
-        aria-label="Ga naar vandaag"
+        title={labels.goToToday}
+        aria-label={labels.goToToday}
       >
-        Vandaag
+        {labels.today}
       </button>
 
-      {/* ── Divider ────────────────────────────────────────── */}
       <div className="w-px h-5 bg-border mx-1" />
 
-      {/* ── Undo / Redo ─────────────────────────────────────── */}
       <button
         type="button"
         className={btnClass}
         onClick={() => useGanttStore.getState().undo()}
-        title="Ongedaan maken (Ctrl+Z)"
-        aria-label="Ongedaan maken"
+        title={labels.undo}
+        aria-label={labels.undo}
       >
         &#x21A9;
       </button>
@@ -185,16 +156,14 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
         type="button"
         className={btnClass}
         onClick={() => useGanttStore.getState().redo()}
-        title="Opnieuw (Ctrl+Shift+Z)"
-        aria-label="Opnieuw"
+        title={labels.redo}
+        aria-label={labels.redo}
       >
         &#x21AA;
       </button>
 
-      {/* ── Divider ────────────────────────────────────────── */}
       <div className="w-px h-5 bg-border mx-1" />
 
-      {/* ── PRO: Critical Path toggle ─────────────────────── */}
       <button
         type="button"
         className={
@@ -203,14 +172,13 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
             : btnClass
         }
         onClick={() => updateConfig({ showCriticalPath: !config.showCriticalPath })}
-        title="Kritiek pad tonen/verbergen"
-        aria-label="Kritiek pad"
+        title={labels.criticalPathTitle}
+        aria-label={labels.criticalPath}
         aria-pressed={config.showCriticalPath}
       >
-        Kritiek pad
+        {labels.criticalPath}
       </button>
 
-      {/* ── PRO: Baselines toggle ─────────────────────────── */}
       <button
         type="button"
         className={
@@ -219,25 +187,23 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
             : btnClass
         }
         onClick={() => updateConfig({ showBaselines: !config.showBaselines })}
-        title="Baselines tonen/verbergen"
-        aria-label="Baselines"
+        title={labels.baselinesTitle}
+        aria-label={labels.baselines}
         aria-pressed={config.showBaselines}
       >
-        Baselines
+        {labels.baselines}
       </button>
 
-      {/* ── PRO: Auto-plan button ─────────────────────────── */}
       <button
         type="button"
         className={btnClass}
         onClick={autoScheduleTasks}
-        title="Automatisch plannen op basis van afhankelijkheden"
-        aria-label="Automatisch plannen"
+        title={labels.autoPlanTitle}
+        aria-label={labels.autoPlan}
       >
-        Auto-plan
+        {labels.autoPlan}
       </button>
 
-      {/* ── PRO: Slack toggle ─────────────────────────────── */}
       <button
         type="button"
         className={
@@ -246,14 +212,13 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
             : btnClass
         }
         onClick={() => updateConfig({ showSlack: !config.showSlack })}
-        title="Slack/speling tonen/verbergen"
-        aria-label="Slack"
+        title={labels.slackTitle}
+        aria-label={labels.slack}
         aria-pressed={config.showSlack}
       >
-        Slack
+        {labels.slack}
       </button>
 
-      {/* ── PRO: Row mode toggle ─────────────────────────── */}
       <button
         type="button"
         className={
@@ -266,17 +231,15 @@ export function GanttToolbar({ chartRef }: GanttToolbarProps = {}) {
             rowMode: config.rowMode === 'multi' ? 'single' : 'multi',
           })
         }
-        title="Rij-modus: enkel of meerdere items per rij"
-        aria-label="Rij-modus"
+        title={labels.rowsTitle}
+        aria-label={labels.rows}
         aria-pressed={config.rowMode === 'multi'}
       >
-        Rijen
+        {labels.rows}
       </button>
 
-      {/* ── Divider ────────────────────────────────────────── */}
       <div className="w-px h-5 bg-border mx-1" />
 
-      {/* ── Export ────────────────────────────────────────── */}
       {chartRef && <ExportButton chartRef={chartRef} filename="bms-gantt" />}
     </div>
   );

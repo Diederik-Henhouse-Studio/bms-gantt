@@ -1,6 +1,8 @@
 import React from 'react';
 import { useGanttStore, dateToX } from '../store';
 import type { GanttMarker } from '../store';
+import { useLabels } from '../i18n';
+import { useNow } from '../hooks/useNow';
 
 // ── Color mapping ───────────────────────────────────────────────────
 
@@ -42,8 +44,9 @@ export function Markers() {
   const totalWidth = useGanttStore((s) => s.totalWidth);
   const totalHeight = useGanttStore((s) => s.totalHeight);
 
-  // H7: geen useMemo — new Date() is goedkoop en moet elke render actueel zijn
-  const today = new Date();
+  const labels = useLabels();
+  // Refreshes every minute so the now-line ticks without external rerenders.
+  const today = useNow();
   const todayX = dateToX(today, dateRange, totalWidth);
 
   // Check if today falls within the visible date range
@@ -114,7 +117,7 @@ export function Markers() {
           >
             <div className="flex justify-center">
               <span className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full whitespace-nowrap leading-none">
-                Vandaag
+                {labels.today}
               </span>
             </div>
           </foreignObject>

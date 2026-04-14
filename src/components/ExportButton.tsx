@@ -6,6 +6,7 @@
 import React, { useState, useCallback } from 'react';
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
+import { useLabels } from '../i18n';
 
 // ── Types ───────────────────────────────────────────────────
 
@@ -154,7 +155,7 @@ export function ExportButton({ chartRef, filename = 'gantt-export' }: ExportButt
         }
       } catch (err) {
         console.error('Export failed:', err);
-        alert('Export mislukt. Probeer het opnieuw.');
+        alert('Export failed. Please try again.');
       } finally {
         setIsExporting(false);
       }
@@ -162,6 +163,7 @@ export function ExportButton({ chartRef, filename = 'gantt-export' }: ExportButt
     [chartRef, filename],
   );
 
+  const labels = useLabels();
   return (
     <div className="relative">
       <button
@@ -169,10 +171,10 @@ export function ExportButton({ chartRef, filename = 'gantt-export' }: ExportButt
         className="px-2 py-1 text-xs rounded hover:bg-accent transition-colors select-none disabled:opacity-50"
         onClick={() => setShowMenu(!showMenu)}
         disabled={isExporting}
-        title="Exporteer Gantt chart"
-        aria-label="Exporteer"
+        title={labels.exportChart}
+        aria-label={labels.export}
       >
-        {isExporting ? '⏳' : '📥'} Export
+        {isExporting ? '⏳' : '📥'} {labels.export}
       </button>
 
       {showMenu && (
@@ -189,14 +191,14 @@ export function ExportButton({ chartRef, filename = 'gantt-export' }: ExportButt
               className="w-full px-3 py-1.5 text-sm text-left hover:bg-accent rounded-sm mx-0"
               onClick={() => handleExport('png')}
             >
-              🖼️ PNG afbeelding
+              🖼️ {labels.exportAsPng}
             </button>
             <button
               type="button"
               className="w-full px-3 py-1.5 text-sm text-left hover:bg-accent rounded-sm mx-0"
               onClick={() => handleExport('pdf')}
             >
-              📄 PDF document
+              📄 {labels.exportAsPdf}
             </button>
           </div>
         </>

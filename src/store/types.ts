@@ -45,6 +45,7 @@ export type LinkType = 'e2s' | 'e2e' | 's2s' | 's2e';
 
 /** Timeline unit granularity. */
 export type ScaleUnit =
+  | 'minute'
   | 'hour'
   | 'day'
   | 'week'
@@ -309,6 +310,7 @@ export interface GanttConfig {
 
 /** Named zoom preset identifier. */
 export type ZoomLevel =
+  | 'minutes'
   | 'hours'
   | 'days'
   | 'weeks'

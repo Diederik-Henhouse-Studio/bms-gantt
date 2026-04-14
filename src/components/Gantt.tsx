@@ -14,6 +14,7 @@ import { useGanttStore } from '../store';
 import type { GanttTask, GanttLink, GanttMarker, GanttConfig } from '../store';
 import { GanttLayout } from './GanttLayout';
 import { GanttErrorBoundary } from './GanttErrorBoundary';
+import { LabelsProvider, type GanttLabels } from '../i18n';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -23,6 +24,8 @@ export interface GanttProps {
   markers?: GanttMarker[];
   config?: Partial<GanttConfig>;
   className?: string;
+  /** Override UI strings. Defaults are English; merge-patched onto defaults. */
+  labels?: Partial<GanttLabels>;
 
   // Event callbacks
   onTaskClick?: (task: GanttTask) => void;
@@ -41,6 +44,7 @@ export function Gantt({
   markers = [],
   config,
   className,
+  labels,
   onTaskClick,
   onTaskDoubleClick,
   onTaskUpdate,
@@ -119,13 +123,15 @@ export function Gantt({
       )}
     >
       <GanttErrorBoundary onError={onError}>
-        <GanttLayout
-          onTaskClick={onTaskClick}
-          onTaskDoubleClick={onTaskDoubleClick}
-          onTaskUpdate={onTaskUpdate}
-          onLinkCreate={onLinkCreate}
-          onLinkDelete={onLinkDelete}
-        />
+        <LabelsProvider labels={labels}>
+          <GanttLayout
+            onTaskClick={onTaskClick}
+            onTaskDoubleClick={onTaskDoubleClick}
+            onTaskUpdate={onTaskUpdate}
+            onLinkCreate={onLinkCreate}
+            onLinkDelete={onLinkDelete}
+          />
+        </LabelsProvider>
       </GanttErrorBoundary>
     </div>
   );

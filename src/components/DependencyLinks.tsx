@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { useGanttStore } from '../store';
 import type { GanttLink } from '../store';
+import { useLabels } from '../i18n';
 
 // ── Midpoint helper ─────────────────────────────────────────────────
 
@@ -52,6 +53,7 @@ export function DependencyLinks() {
   const totalHeight = useGanttStore((s) => s.totalHeight);
   const selectLink = useGanttStore((s) => s.selectLink);
   const removeLink = useGanttStore((s) => s.removeLink);
+  const labels = useLabels();
 
   const handleLinkClick = useCallback(
     (id: string) => (e: React.MouseEvent) => {
@@ -166,7 +168,7 @@ export function DependencyLinks() {
             type="button"
             onClick={handleDelete(selectedLink.id)}
             className="flex items-center justify-center w-5 h-5 rounded-full bg-destructive text-destructive-foreground text-xs font-bold shadow hover:bg-destructive/90 transition-colors"
-            title="Verwijder link"
+            title={labels.deleteLink}
           >
             &times;
           </button>

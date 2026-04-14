@@ -6,6 +6,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { format, differenceInCalendarDays, addDays } from 'date-fns';
 import type { GanttTask, TaskType, TaskCategory } from '../store/types';
+import { useLabels } from '../i18n';
 
 // ━━━ Props ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -22,20 +23,14 @@ export interface TaskEditorProps {
 
 // ━━━ Constants ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-const TYPE_OPTIONS: { value: TaskType; label: string }[] = [
-  { value: 'task', label: 'Taak' },
-  { value: 'summary', label: 'Samenvatting' },
-  { value: 'milestone', label: 'Mijlpaal' },
-];
-
 const CATEGORY_OPTIONS: { value: TaskCategory; label: string }[] = [
-  { value: 'f1', label: 'F1 – Fase 1' },
-  { value: 'f2', label: 'F2 – Fase 2' },
-  { value: 'f3', label: 'F3 – Fase 3' },
+  { value: 'f1', label: 'F1' },
+  { value: 'f2', label: 'F2' },
+  { value: 'f3', label: 'F3' },
   { value: 'transport', label: 'Transport' },
-  { value: 'inspectie', label: 'Inspectie' },
+  { value: 'inspectie', label: 'Inspection' },
   { value: 'order', label: 'Order' },
-  { value: 'generic', label: 'Generiek' },
+  { value: 'generic', label: 'Generic' },
 ];
 
 // ━━━ Helpers ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -161,6 +156,13 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
     [onClose],
   );
 
+  const labels = useLabels();
+  const TYPE_OPTIONS: { value: TaskType; label: string }[] = [
+    { value: 'task', label: labels.taskTypes.task },
+    { value: 'summary', label: labels.taskTypes.summary },
+    { value: 'milestone', label: labels.taskTypes.milestone },
+  ];
+
   // ── Render nothing when closed ────────────────────────────
   if (!task) return null;
 
@@ -177,12 +179,12 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
       <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-xl">
         {/* ── Header ─────────────────────────────────────────── */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Taak bewerken</h2>
+          <h2 className="text-lg font-semibold text-foreground">{labels.editTask}</h2>
           <button
             type="button"
             onClick={onClose}
             className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-            aria-label="Sluiten"
+            aria-label={labels.close}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -211,10 +213,10 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
           }}
           className="space-y-4"
         >
-          {/* Naam */}
+          {/* Name */}
           <div className="flex flex-col gap-1">
             <label className={labelCls} htmlFor="te-name">
-              Naam
+              {labels.name}
             </label>
             <input
               id="te-name"
@@ -229,7 +231,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
               <label className={labelCls} htmlFor="te-type">
-                Type
+                {labels.type}
               </label>
               <select
                 id="te-type"
@@ -247,7 +249,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
 
             <div className="flex flex-col gap-1">
               <label className={labelCls} htmlFor="te-category">
-                Categorie
+                {labels.category}
               </label>
               <select
                 id="te-category"
@@ -268,7 +270,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
           <div className="grid grid-cols-3 gap-4">
             <div className="flex flex-col gap-1">
               <label className={labelCls} htmlFor="te-start">
-                Start
+                {labels.start}
               </label>
               <input
                 id="te-start"
@@ -281,7 +283,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
 
             <div className="flex flex-col gap-1">
               <label className={labelCls} htmlFor="te-end">
-                Eind
+                {labels.end}
               </label>
               <input
                 id="te-end"
@@ -294,7 +296,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
 
             <div className="flex flex-col gap-1">
               <label className={labelCls} htmlFor="te-duration">
-                Duur (dagen)
+                {labels.durationDays}
               </label>
               <input
                 id="te-duration"
@@ -310,7 +312,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
           {/* Voortgang */}
           <div className="flex flex-col gap-1">
             <label className={labelCls} htmlFor="te-progress">
-              Voortgang: {progress}%
+              {labels.progress}: {progress}%
             </label>
             <input
               id="te-progress"
@@ -326,7 +328,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
           {/* Notities */}
           <div className="flex flex-col gap-1">
             <label className={labelCls} htmlFor="te-notes">
-              Notities
+              {labels.notes}
             </label>
             <textarea
               id="te-notes"
@@ -346,7 +348,7 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
               onClick={handleDelete}
               className="rounded px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
             >
-              Verwijderen
+              {labels.delete}
             </button>
 
             <div className="flex gap-2">
@@ -355,13 +357,13 @@ export const TaskEditor: React.FC<TaskEditorProps> = ({
                 onClick={onClose}
                 className="rounded border border-border px-3 py-1.5 text-sm font-medium text-foreground hover:bg-muted"
               >
-                Annuleren
+                {labels.cancel}
               </button>
               <button
                 type="submit"
                 className="rounded bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
-                Opslaan
+                {labels.save}
               </button>
             </div>
           </div>

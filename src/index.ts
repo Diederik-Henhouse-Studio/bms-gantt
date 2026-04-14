@@ -31,5 +31,9 @@ export type {
   LinkType,
 } from './store';
 
+// i18n
+export type { GanttLabels } from './i18n';
+export { DEFAULT_LABELS } from './i18n';
+
 // Presets (example domain integration)
 export * from './presets';
