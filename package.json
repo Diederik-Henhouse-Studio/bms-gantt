@@ -1,6 +1,6 @@
 {
   "name": "@bluemillstudio/gantt",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Interactive Gantt chart component for React — drag & drop, dependencies, critical path, auto-scheduling",
   "author": "Blue Mill Studio",
   "license": "MIT",
@@ -63,7 +63,8 @@
     "prepublishOnly": "npm run build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "peerDependencies": {
     "@tanstack/react-table": "^8.0.0",
