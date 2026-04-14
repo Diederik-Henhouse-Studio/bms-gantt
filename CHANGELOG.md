@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-14
+
+### Added
+- **Bulk operations** on the store: `removeTasks(ids)` and `shiftTasks(ids, deltaDays)` — single undo step per call.
+- **Delete/Backspace keyboard shortcut** — removes currently selected tasks (ignored when focus is in an input/textarea).
+- **`slots.renderHeaderCell`** — override the content of timeline header cells.
+- **Context menu multi-select** — shows "Delete (N)" when more than one task is selected (requires `onDeleteSelection` prop wired by the consumer).
+
+### Changed
+- Tests: 170 → 177 (+7 bulkOps suite).
+
 ## [0.3.0] - 2026-04-14
 
 ### Added

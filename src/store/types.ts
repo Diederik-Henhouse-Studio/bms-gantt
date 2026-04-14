@@ -426,6 +426,10 @@ export interface GanttActions {
   updateTask: (id: string, patch: Partial<Omit<GanttTask, 'id'>>) => void;
   /** Remove a task and any links referencing it. Triggers recalculate. */
   removeTask: (id: string) => void;
+  /** Bulk remove tasks (and descendants) as a single undo step. */
+  removeTasks: (ids: string[]) => void;
+  /** Shift multiple tasks by N calendar days. Honours lockStart/lockEnd. */
+  shiftTasks: (ids: string[], deltaDays: number) => void;
 
   // ── Link CRUD ─────────────────────────────────────────────
   /** Add a dependency link. Triggers recalculate. */

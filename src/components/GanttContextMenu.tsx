@@ -6,9 +6,12 @@ import { useLabels } from '../i18n';
 interface GanttContextMenuProps {
   position: { x: number; y: number } | null;
   taskId: string | null;
+  /** Currently selected task ids (includes taskId or is empty when only the right-clicked task applies). */
+  selectedTaskIds?: string[];
   onClose: () => void;
   onEditTask: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
+  onDeleteSelection?: (taskIds: string[]) => void;
   onAddSubtask: (parentId: string) => void;
   onAddLink: (sourceId: string) => void;
 }
@@ -18,9 +21,11 @@ interface GanttContextMenuProps {
 export function GanttContextMenu({
   position,
   taskId,
+  selectedTaskIds = [],
   onClose,
   onEditTask,
   onDeleteTask,
+  onDeleteSelection,
   onAddSubtask,
   onAddLink,
 }: GanttContextMenuProps) {
@@ -95,15 +100,27 @@ export function GanttContextMenu({
 
       <div className="border-t my-1" />
 
-      <div
-        className={`${itemClass} text-red-500`}
-        onClick={() => {
-          onDeleteTask(taskId);
-          onClose();
-        }}
-      >
-        🗑️ {labels.delete}
-      </div>
+      {selectedTaskIds.length > 1 && onDeleteSelection ? (
+        <div
+          className={`${itemClass} text-red-500`}
+          onClick={() => {
+            onDeleteSelection(selectedTaskIds);
+            onClose();
+          }}
+        >
+          🗑️ {labels.delete} ({selectedTaskIds.length})
+        </div>
+      ) : (
+        <div
+          className={`${itemClass} text-red-500`}
+          onClick={() => {
+            onDeleteTask(taskId);
+            onClose();
+          }}
+        >
+          🗑️ {labels.delete}
+        </div>
+      )}
     </div>
   );
 }
