@@ -104,6 +104,7 @@ export default function Planning() {
 | `config` | `Partial<GanttConfig>` | No | Configuration overrides |
 | `className` | `string` | No | Extra CSS class on the container |
 | `labels` | `Partial<GanttLabels>` | No | Override UI strings (defaults are English) |
+| `slots` | `GanttSlots` | No | Customisation slots: `renderTaskBar`, `columns` |
 | `onTaskClick` | `(task: GanttTask) => void` | No | Fires on task bar click |
 | `onTaskDoubleClick` | `(task: GanttTask) => void` | No | Fires on task bar double-click |
 | `onTaskUpdate` | `(task: GanttTask) => void` | No | Fires after drag/resize/progress change |
@@ -131,6 +132,11 @@ export default function Planning() {
 | `slack` | `number` | No | Computed: slack in working days |
 | `segments` | `TaskSegment[]` | No | Segments for split tasks |
 | `taskCategory` | `TaskCategory` | No | Optional, consumer-defined category used for bar colour |
+| `minDuration` | `number` | No | Minimum duration in calendar days — resize is clamped to this value |
+| `maxDuration` | `number` | No | Maximum duration in calendar days — resize is clamped to this value |
+| `lockStart` | `boolean` | No | When true, the start date cannot be changed by drag/resize |
+| `lockEnd` | `boolean` | No | When true, the end date cannot be changed by drag/resize |
+| `noOverlap` | `boolean` | No | When true, drag reverts if it would overlap a sibling (same parentId) |
 | `projectId` | `string` | No | Optional: FK to a parent project/dossier |
 | `status` | `TaskStatus` | No | Lifecycle: `planned`, `active`, `paused`, `completed`, `cancelled` |
 | `color` | `string` | No | Override bar colour (CSS value) |
@@ -297,6 +303,34 @@ The [`src/presets/examples/grondwijzer.ts`](src/presets/examples/grondwijzer.ts)
 - Provide a default `GanttConfig` and a holidays array
 
 You are not expected to use the Grondwijzer preset directly — copy it into your own app and adapt it to your domain.
+
+## Customisation slots
+
+Customise parts of the chart via the `slots` prop — all fields are optional.
+
+```tsx
+import { Gantt, type GanttSlots } from '@bluemillstudio/gantt';
+import { createColumnHelper } from '@tanstack/react-table';
+
+const helper = createColumnHelper<GanttTask>();
+
+const slots: GanttSlots = {
+  // Replace the default left-pane columns
+  columns: [
+    helper.accessor('text', { header: 'Name', size: 240 }),
+    helper.accessor('projectId', { header: 'Project', size: 140 }),
+    helper.accessor('progress', { header: '%', size: 60 }),
+  ],
+  // Replace the inner content of regular task bars
+  renderTaskBar: (task) => (
+    <div className="flex h-full items-center px-1 text-[11px] text-white">
+      {task.text} — {task.progress}%
+    </div>
+  ),
+};
+
+<Gantt tasks={tasks} slots={slots} />
+```
 
 ## Internationalisation
 

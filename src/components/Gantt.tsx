@@ -15,6 +15,7 @@ import type { GanttTask, GanttLink, GanttMarker, GanttConfig } from '../store';
 import { GanttLayout } from './GanttLayout';
 import { GanttErrorBoundary } from './GanttErrorBoundary';
 import { LabelsProvider, type GanttLabels } from '../i18n';
+import { SlotsProvider, type GanttSlots } from '../slots';
 
 // ── Props ────────────────────────────────────────────────────
 
@@ -26,6 +27,8 @@ export interface GanttProps {
   className?: string;
   /** Override UI strings. Defaults are English; merge-patched onto defaults. */
   labels?: Partial<GanttLabels>;
+  /** Customisation slots: custom task bar renderer, custom left-pane columns. */
+  slots?: GanttSlots;
 
   // Event callbacks
   onTaskClick?: (task: GanttTask) => void;
@@ -45,6 +48,7 @@ export function Gantt({
   config,
   className,
   labels,
+  slots,
   onTaskClick,
   onTaskDoubleClick,
   onTaskUpdate,
@@ -124,6 +128,7 @@ export function Gantt({
     >
       <GanttErrorBoundary onError={onError}>
         <LabelsProvider labels={labels}>
+          <SlotsProvider slots={slots}>
           <GanttLayout
             onTaskClick={onTaskClick}
             onTaskDoubleClick={onTaskDoubleClick}
@@ -131,6 +136,7 @@ export function Gantt({
             onLinkCreate={onLinkCreate}
             onLinkDelete={onLinkDelete}
           />
+          </SlotsProvider>
         </LabelsProvider>
       </GanttErrorBoundary>
     </div>

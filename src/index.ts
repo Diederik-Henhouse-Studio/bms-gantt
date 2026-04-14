@@ -35,5 +35,8 @@ export type {
 export type { GanttLabels } from './i18n';
 export { DEFAULT_LABELS } from './i18n';
 
+// Customisation slots
+export type { GanttSlots } from './slots';
+
 // Presets (example domain integration)
 export * from './presets';
