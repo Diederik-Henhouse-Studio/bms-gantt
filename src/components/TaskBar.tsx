@@ -6,6 +6,7 @@
 import React from 'react';
 import { cn } from '../utils/cn';
 import type { GanttTask, TaskCategory } from '../store';
+import { useSlots } from '../slots';
 
 // ── Props ──────────────────────────────────────────────────────
 
@@ -155,6 +156,8 @@ function SummaryBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
 function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDragStart }: TaskBarProps) {
   const colors = getCategoryColors(task);
   const progressPct = Math.max(0, Math.min(100, task.progress));
+  const { renderTaskBar } = useSlots();
+  const customContent = renderTaskBar?.(task);
 
   return (
     <div
@@ -182,24 +185,30 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         }
       } : undefined}
     >
-      {/* Progress fill */}
-      <div
-        className={cn(
-          'absolute inset-y-0 left-0 rounded-sm',
-          !colors.custom && colors.fill,
-        )}
-        style={{
-          width: `${progressPct}%`,
-          ...(colors.custom
-            ? { backgroundColor: colors.custom, filter: 'brightness(0.8)' }
-            : {}),
-        }}
-      />
+      {customContent !== undefined ? (
+        <div className="relative z-10 w-full h-full">{customContent}</div>
+      ) : (
+        <>
+          {/* Progress fill */}
+          <div
+            className={cn(
+              'absolute inset-y-0 left-0 rounded-sm',
+              !colors.custom && colors.fill,
+            )}
+            style={{
+              width: `${progressPct}%`,
+              ...(colors.custom
+                ? { backgroundColor: colors.custom, filter: 'brightness(0.8)' }
+                : {}),
+            }}
+          />
 
-      {/* Text label */}
-      <div className="relative z-10 flex items-center h-full px-1.5">
-        <span className="text-xs text-white truncate">{task.text}</span>
-      </div>
+          {/* Text label */}
+          <div className="relative z-10 flex items-center h-full px-1.5">
+            <span className="text-xs text-white truncate">{task.text}</span>
+          </div>
+        </>
+      )}
 
       {/* Resize handles (left / right) */}
       {!readonly && (

@@ -47,6 +47,11 @@ import {
 
 import { calcCriticalPath, calcSlack, autoSchedule } from './scheduling';
 import { createCalendar } from './calendar';
+import {
+  applyMoveConstraints,
+  applyResizeStartConstraints,
+  applyResizeEndConstraints,
+} from './dragConstraints';
 
 // ── Default config ────────────────────────────────────────────
 
@@ -441,11 +446,12 @@ const ganttStateCreator: StateCreator<GanttState> = (set, get) => {
             const newEnd = new Date(original.end.getTime() + deltaMs);
             const finalStart = snap ? snapToUnit(newStart, snap) : newStart;
             const finalEnd = snap ? snapToUnit(newEnd, snap) : newEnd;
+            const constrained = applyMoveConstraints(original, finalStart, finalEnd, state.tasks);
             set((s) => ({
               dragState: null,
               tasks: s.tasks.map((t) =>
                 t.id === dragState.taskId
-                  ? { ...t, start: finalStart, end: finalEnd }
+                  ? { ...t, start: constrained.start, end: constrained.end }
                   : t,
               ),
             }));
@@ -460,11 +466,12 @@ const ganttStateCreator: StateCreator<GanttState> = (set, get) => {
             // Zorg dat start niet voorbij end gaat
             const clampedStart = newStart > original.end ? original.end : newStart;
             const finalStart = snap ? snapToUnit(clampedStart, snap) : clampedStart;
+            const constrained = applyResizeStartConstraints(original, finalStart, original.end, state.tasks);
             set((s) => ({
               dragState: null,
               tasks: s.tasks.map((t) =>
                 t.id === dragState.taskId
-                  ? { ...t, start: finalStart }
+                  ? { ...t, start: constrained.start }
                   : t,
               ),
             }));
@@ -479,11 +486,12 @@ const ganttStateCreator: StateCreator<GanttState> = (set, get) => {
             // Zorg dat end niet vóór start gaat
             const clampedEnd = newEnd < original.start ? original.start : newEnd;
             const finalEnd = snap ? snapToUnit(clampedEnd, snap) : clampedEnd;
+            const constrained = applyResizeEndConstraints(original, original.start, finalEnd, state.tasks);
             set((s) => ({
               dragState: null,
               tasks: s.tasks.map((t) =>
                 t.id === dragState.taskId
-                  ? { ...t, end: finalEnd }
+                  ? { ...t, end: constrained.end }
                   : t,
               ),
             }));

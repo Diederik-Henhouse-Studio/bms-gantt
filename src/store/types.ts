@@ -177,6 +177,21 @@ export interface GanttTask {
    * When unset the colour is derived from `taskCategory`.
    */
   color?: string;
+
+  // ── Drag constraints (optional) ────────────────────────────
+  /** Minimum duration in calendar days. Resize is clamped to this value. */
+  minDuration?: number;
+  /** Maximum duration in calendar days. Resize is clamped to this value. */
+  maxDuration?: number;
+  /** When true, the task's start date cannot be changed by drag/resize. */
+  lockStart?: boolean;
+  /** When true, the task's end date cannot be changed by drag/resize. */
+  lockEnd?: boolean;
+  /**
+   * When true, the task cannot be dragged into a time range occupied by
+   * another task that shares its parent. Attempts to overlap revert the drag.
+   */
+  noOverlap?: boolean;
 }
 
 // ━━━ GanttLink ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

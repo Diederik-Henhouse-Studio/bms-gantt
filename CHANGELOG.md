@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-14
+
+### Added
+- **Drag constraints** on `GanttTask`: `minDuration`, `maxDuration`, `lockStart`, `lockEnd`, `noOverlap`. Enforced during move, resize-start, and resize-end.
+- **Custom left-pane columns** via `slots.columns` prop. Falls back to default column set when omitted.
+- **Custom task bar renderer** via `slots.renderTaskBar` — returns ReactNode rendered inside the bar wrapper.
+- Public `GanttSlots` type export.
+
+### Changed
+- Bumped tests from 160 → 170.
+
 ## [0.2.0] - 2026-04-14
 
 ### Added

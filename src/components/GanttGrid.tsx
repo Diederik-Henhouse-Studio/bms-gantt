@@ -7,6 +7,7 @@ import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react'
 import { format, addDays, parse } from 'date-fns';
 import { enUS } from 'date-fns/locale/en-US';
 import { useLabels } from '../i18n';
+import { useSlots } from '../slots';
 import {
   useReactTable,
   getCoreRowModel,
@@ -79,6 +80,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
   const toggleTaskOpen = useGanttStore((s) => s.toggleTaskOpen);
   const updateTask = useGanttStore((s) => s.updateTask);
   const labels = useLabels();
+  const slots = useSlots();
 
   const [editingCell, setEditingCell] = useState<{ taskId: string; columnId: string } | null>(null);
 
@@ -92,7 +94,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
 
   // ── Column definitions ─────────────────────────────────
 
-  const columns = useMemo<ColumnDef<GanttTask, any>[]>(
+  const defaultColumns = useMemo<ColumnDef<GanttTask, any>[]>(
     () => [
       columnHelper.accessor('text', {
         id: 'text',
@@ -301,6 +303,9 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
     ],
     [handleToggle, editingCell, updateTask, labels],
   );
+
+  /** Columns: consumer override via slots.columns, else defaults. */
+  const columns = slots.columns ?? defaultColumns;
 
   // ── Task lookup for multi-row mode ─────────────────────
   const taskMap = useMemo(() => {
