@@ -263,9 +263,9 @@ describe('snapToUnit', () => {
 // ═══════════════════════════════════════════════════════════════
 
 describe('ZOOM_PRESETS', () => {
-  const expectedLevels = ['hours', 'days', 'weeks', 'months', 'quarters', 'years'] as const;
+  const expectedLevels = ['minutes', 'hours', 'days', 'weeks', 'months', 'quarters', 'years'] as const;
 
-  it('all 6 levels exist', () => {
+  it('all 7 levels exist', () => {
     for (const level of expectedLevels) {
       expect(ZOOM_PRESETS[level]).toBeDefined();
       expect(ZOOM_PRESETS[level].cellWidth).toBeGreaterThan(0);
@@ -276,5 +276,12 @@ describe('ZOOM_PRESETS', () => {
   it('years preset has at least 1 scale', () => {
     expect(ZOOM_PRESETS.years.scales.length).toBeGreaterThanOrEqual(1);
     expect(ZOOM_PRESETS.years.scales[0].unit).toBe('year');
+  });
+
+  it('minutes preset uses minute + hour scales', () => {
+    const scales = ZOOM_PRESETS.minutes.scales;
+    const units = scales.map((s) => s.unit);
+    expect(units).toContain('minute');
+    expect(units).toContain('hour');
   });
 });

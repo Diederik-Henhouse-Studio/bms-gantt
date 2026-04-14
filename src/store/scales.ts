@@ -30,6 +30,13 @@ interface ZoomPreset {
 // ---------------------------------------------------------------------------
 
 export const ZOOM_PRESETS: Record<ZoomPresetKey, ZoomPreset> = {
+  minutes: {
+    scales: [
+      { unit: "hour", format: "HH:00" },
+      { unit: "minute", format: "mm" },
+    ],
+    cellWidth: 20,
+  },
   hours: {
     scales: [
       { unit: "day", format: "d MMM" },

@@ -103,6 +103,7 @@ export default function Planning() {
 | `markers` | `GanttMarker[]` | No | Vertical marker lines |
 | `config` | `Partial<GanttConfig>` | No | Configuration overrides |
 | `className` | `string` | No | Extra CSS class on the container |
+| `labels` | `Partial<GanttLabels>` | No | Override UI strings (defaults are English) |
 | `onTaskClick` | `(task: GanttTask) => void` | No | Fires on task bar click |
 | `onTaskDoubleClick` | `(task: GanttTask) => void` | No | Fires on task bar double-click |
 | `onTaskUpdate` | `(task: GanttTask) => void` | No | Fires after drag/resize/progress change |
@@ -177,6 +178,7 @@ The chart supports 6 zoom levels via `ZOOM_PRESETS`:
 
 | Level | Top header | Bottom header | Cell width | Suitable for |
 |-------|-----------|---------------|-----------|--------------|
+| `minutes` | Hour (`HH:00`) | Minute (`mm`) | 20px | Intra-day scheduling (default 15-min steps) |
 | `hours` | Day (`d MMM`) | Hour (`HH`) | 40px | Detailed day-level planning |
 | `days` | Month (`MMM yyyy`) | Day (`d`) | 32px | Weekly planning |
 | `weeks` | Month (`MMM yyyy`) | Week (`W1`) | 80px | Monthly overview |
@@ -295,6 +297,26 @@ The [`src/presets/examples/grondwijzer.ts`](src/presets/examples/grondwijzer.ts)
 - Provide a default `GanttConfig` and a holidays array
 
 You are not expected to use the Grondwijzer preset directly — copy it into your own app and adapt it to your domain.
+
+## Internationalisation
+
+All UI strings are English by default and can be overridden via the `labels` prop:
+
+```tsx
+import { Gantt, type GanttLabels } from '@bluemillstudio/gantt';
+
+const dutch: Partial<GanttLabels> = {
+  today: 'Vandaag',
+  zoomIn: 'Inzoomen',
+  zoomOut: 'Uitzoomen',
+  save: 'Opslaan',
+  cancel: 'Annuleren',
+};
+
+<Gantt tasks={tasks} labels={dutch} />
+```
+
+See `DEFAULT_LABELS` exported from the package for the full list of keys.
 
 ## Styling & Theming
 

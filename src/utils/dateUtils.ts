@@ -6,35 +6,38 @@ import {
   startOfYear,
   endOfDay,
   addDays,
+  addMinutes,
   addWeeks,
   addMonths,
   addQuarters,
   addYears,
   differenceInDays,
+  differenceInMinutes,
   differenceInWeeks,
   differenceInMonths,
   differenceInQuarters,
   differenceInYears,
   format,
 } from "date-fns";
-import { nl } from "date-fns/locale/nl";
+import { enUS } from "date-fns/locale/en-US";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type TimeUnit = "hour" | "day" | "week" | "month" | "quarter" | "year";
+type TimeUnit = "minute" | "hour" | "day" | "week" | "month" | "quarter" | "year";
 
 // ---------------------------------------------------------------------------
 // Unit boundary helpers
 // ---------------------------------------------------------------------------
 
-/**
- * Snap a date to the start of the given unit.
- * Week starts on Monday (weekStartsOn: 1).
- */
 export function getUnitStart(date: Date, unit: TimeUnit): Date {
   switch (unit) {
+    case "minute": {
+      const d = new Date(date);
+      d.setSeconds(0, 0);
+      return d;
+    }
     case "hour": {
       const d = new Date(date);
       d.setMinutes(0, 0, 0);
@@ -53,11 +56,13 @@ export function getUnitStart(date: Date, unit: TimeUnit): Date {
   }
 }
 
-/**
- * Get the end of the given unit for a date.
- */
 export function getUnitEnd(date: Date, unit: TimeUnit): Date {
   switch (unit) {
+    case "minute": {
+      const d = new Date(date);
+      d.setSeconds(59, 999);
+      return d;
+    }
     case "hour": {
       const d = new Date(date);
       d.setMinutes(59, 59, 999);
@@ -88,11 +93,10 @@ export function getUnitEnd(date: Date, unit: TimeUnit): Date {
 // Arithmetic
 // ---------------------------------------------------------------------------
 
-/**
- * Add `amount` units to a date.
- */
 export function addUnit(date: Date, unit: TimeUnit, amount: number): Date {
   switch (unit) {
+    case "minute":
+      return addMinutes(date, amount);
     case "hour": {
       const d = new Date(date);
       d.setHours(d.getHours() + amount);
@@ -117,6 +121,8 @@ export function addUnit(date: Date, unit: TimeUnit, amount: number): Date {
  */
 export function diffUnits(start: Date, end: Date, unit: TimeUnit): number {
   switch (unit) {
+    case "minute":
+      return differenceInMinutes(end, start);
     case "hour":
       return (end.getTime() - start.getTime()) / (1000 * 60 * 60);
     case "day":
@@ -133,12 +139,6 @@ export function diffUnits(start: Date, end: Date, unit: TimeUnit): number {
 }
 
 // ---------------------------------------------------------------------------
-// Working-day helpers
-// H6: VERWIJDERD — gebruik createCalendar() uit ./store/calendar.ts
-// als single source of truth voor werkdagen-berekeningen.
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
 // Formatting
 // ---------------------------------------------------------------------------
 
@@ -149,11 +149,12 @@ const DEFAULT_FORMATS: Record<TimeUnit, string> = {
   week: "'W'w",
   day: "d",
   hour: "HH:mm",
+  minute: "HH:mm",
 };
 
 /**
  * Format a date for display in a scale header cell.
- * Uses Dutch (nl) locale by default.
+ * Uses English (en-US) locale by default.
  */
 export function formatScaleLabel(
   date: Date,
@@ -161,5 +162,5 @@ export function formatScaleLabel(
   formatStr?: string,
 ): string {
   const fmt = formatStr ?? DEFAULT_FORMATS[unit];
-  return format(date, fmt, { locale: nl });
+  return format(date, fmt, { locale: enUS });
 }

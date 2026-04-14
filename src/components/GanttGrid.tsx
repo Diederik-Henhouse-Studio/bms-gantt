@@ -5,7 +5,8 @@
 
 import React, { useCallback, useMemo, useState, useRef, useEffect } from 'react';
 import { format, addDays, parse } from 'date-fns';
-import { nl } from 'date-fns/locale/nl';
+import { enUS } from 'date-fns/locale/en-US';
+import { useLabels } from '../i18n';
 import {
   useReactTable,
   getCoreRowModel,
@@ -77,6 +78,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
   const selectTask = useGanttStore((s) => s.selectTask);
   const toggleTaskOpen = useGanttStore((s) => s.toggleTaskOpen);
   const updateTask = useGanttStore((s) => s.updateTask);
+  const labels = useLabels();
 
   const [editingCell, setEditingCell] = useState<{ taskId: string; columnId: string } | null>(null);
 
@@ -94,7 +96,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
     () => [
       columnHelper.accessor('text', {
         id: 'text',
-        header: 'Taak',
+        header: labels.columnTask,
         size: 200,
         minSize: 100,
         maxSize: 400,
@@ -132,7 +134,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
                 <button
                   className="shrink-0 p-0.5 rounded hover:bg-muted/80 text-muted-foreground"
                   onClick={(e) => handleToggle(e, task.id)}
-                  aria-label={task.open ? 'Inklappen' : 'Uitklappen'}
+                  aria-label={task.open ? 'Collapse' : 'Expand'}
                 >
                   <span className="text-xs">
                     {task.open ? '▼' : '▶'}
@@ -159,7 +161,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
 
       columnHelper.accessor('start', {
         id: 'start',
-        header: 'Start',
+        header: labels.columnStart,
         size: 90,
         minSize: 70,
         maxSize: 120,
@@ -186,13 +188,13 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
             );
           }
 
-          return format(getValue() as Date, 'dd MMM', { locale: nl });
+          return format(getValue() as Date, 'dd MMM', { locale: enUS });
         },
       }),
 
       columnHelper.accessor('end', {
         id: 'end',
-        header: 'Eind',
+        header: labels.columnEnd,
         size: 90,
         minSize: 70,
         maxSize: 120,
@@ -219,13 +221,13 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
             );
           }
 
-          return format(getValue() as Date, 'dd MMM', { locale: nl });
+          return format(getValue() as Date, 'dd MMM', { locale: enUS });
         },
       }),
 
       columnHelper.display({
         id: 'duration',
-        header: 'Duur',
+        header: labels.columnDuration,
         size: 60,
         minSize: 40,
         maxSize: 100,
@@ -256,7 +258,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
 
       columnHelper.accessor('progress', {
         id: 'progress',
-        header: 'Voortgang',
+        header: labels.columnProgress,
         size: 70,
         minSize: 50,
         maxSize: 120,
@@ -297,7 +299,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
         },
       }),
     ],
-    [handleToggle, editingCell, updateTask],
+    [handleToggle, editingCell, updateTask, labels],
   );
 
   // ── Task lookup for multi-row mode ─────────────────────

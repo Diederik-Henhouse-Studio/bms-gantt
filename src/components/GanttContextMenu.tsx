@@ -1,4 +1,5 @@
 import React, { useEffect, useCallback, useRef } from 'react';
+import { useLabels } from '../i18n';
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -52,6 +53,7 @@ export function GanttContextMenu({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [position, onClose]);
 
+  const labels = useLabels();
   if (!position || !taskId) return null;
 
   const itemClass =
@@ -70,7 +72,7 @@ export function GanttContextMenu({
           onClose();
         }}
       >
-        ✏️ Bewerken
+        ✏️ {labels.edit}
       </div>
       <div
         className={itemClass}
@@ -79,7 +81,7 @@ export function GanttContextMenu({
           onClose();
         }}
       >
-        ➕ Subtaak toevoegen
+        ➕ {labels.addSubtask}
       </div>
       <div
         className={itemClass}
@@ -88,7 +90,7 @@ export function GanttContextMenu({
           onClose();
         }}
       >
-        🔗 Link toevoegen
+        🔗 {labels.addLink}
       </div>
 
       <div className="border-t my-1" />
@@ -100,7 +102,7 @@ export function GanttContextMenu({
           onClose();
         }}
       >
-        🗑️ Verwijderen
+        🗑️ {labels.delete}
       </div>
     </div>
   );
