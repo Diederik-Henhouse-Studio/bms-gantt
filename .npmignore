@@ -1,0 +1,12 @@
+src/
+docs/
+reference/
+node_modules/
+tsup.config.ts
+tsconfig.json
+vitest.config.ts
+*.test.ts
+*.test.tsx
+*.spec.ts
+__tests__/
+.gitignore

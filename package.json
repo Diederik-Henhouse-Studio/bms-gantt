@@ -1,0 +1,91 @@
+{
+  "name": "@bluemillstudio/gantt",
+  "version": "0.1.0",
+  "description": "Interactive Gantt chart component for React — drag & drop, dependencies, critical path, auto-scheduling",
+  "author": "Blue Mill Studio",
+  "license": "MIT",
+  "keywords": [
+    "gantt",
+    "gantt-chart",
+    "react",
+    "react-gantt",
+    "scheduling",
+    "project-management",
+    "typescript",
+    "critical-path",
+    "timeline"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Diederik-Henhouse-Studio/bms-gantt.git"
+  },
+  "homepage": "https://github.com/Diederik-Henhouse-Studio/bms-gantt#readme",
+  "bugs": {
+    "url": "https://github.com/Diederik-Henhouse-Studio/bms-gantt/issues"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    },
+    "./store": {
+      "import": {
+        "types": "./dist/store.d.mts",
+        "default": "./dist/store.mjs"
+      },
+      "require": {
+        "types": "./dist/store.d.ts",
+        "default": "./dist/store.js"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "@tanstack/react-table": "^8.0.0",
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "dependencies": {
+    "date-fns": "^3.6.0",
+    "html-to-image": "^1.11.13",
+    "jspdf": "^4.2.1",
+    "zundo": "^2.3.0",
+    "zustand": "^4.5.7"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^1.6.1",
+    "jsdom": "^29.0.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
