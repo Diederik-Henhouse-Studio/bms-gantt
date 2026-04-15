@@ -1,0 +1,131 @@
+- id: lockstart-blocks-move-pure
+  purpose: "applyMoveConstraints returns blocked when the task has lockStart: true."
+  tags: [happy-path, pure-function]
+  setup:
+    fixtures:
+      task_a:
+        id: a
+        text: Milestone
+        start: "2026-05-01T00:00:00.000Z"
+        end: "2026-05-10T00:00:00.000Z"
+        lockStart: true
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: applyMoveConstraints
+    args:
+      - { ref: task_a }
+      - "2026-06-01T00:00:00.000Z"
+      - "2026-06-10T00:00:00.000Z"
+      - [{ ref: task_a }]
+  then:
+    - probe: return.blocked
+      eq: true
+    - probe: return.start
+      eq: "2026-05-01T00:00:00.000Z"
+
+- id: minduration-clamps-resize-start
+  purpose: "Resize-start respects minDuration by clamping the new start date."
+  tags: [edge, pure-function]
+  setup:
+    fixtures:
+      task_a:
+        id: a
+        text: T
+        start: "2026-05-01T00:00:00.000Z"
+        end: "2026-05-10T00:00:00.000Z"
+        minDuration: 5
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: applyResizeStartConstraints
+    args:
+      - { ref: task_a }
+      - "2026-05-08T00:00:00.000Z"
+      - "2026-05-10T00:00:00.000Z"
+      - [{ ref: task_a }]
+  then:
+    - probe: return.start
+      eq: "2026-05-05T00:00:00.000Z"
+    - probe: return.blocked
+      eq: true
+
+- id: maxduration-clamps-resize-end
+  purpose: "Resize-end caps duration at maxDuration."
+  tags: [edge, pure-function]
+  setup:
+    fixtures:
+      task_a:
+        id: a
+        text: T
+        start: "2026-05-01T00:00:00.000Z"
+        end: "2026-05-10T00:00:00.000Z"
+        maxDuration: 7
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: applyResizeEndConstraints
+    args:
+      - { ref: task_a }
+      - "2026-05-01T00:00:00.000Z"
+      - "2026-05-20T00:00:00.000Z"
+      - [{ ref: task_a }]
+  then:
+    - probe: return.end
+      eq: "2026-05-08T00:00:00.000Z"
+
+- id: nooverlap-reverts-move
+  purpose: "A no-overlap task reverts when moved into a sibling's range."
+  tags: [edge, pure-function]
+  setup:
+    fixtures:
+      task_a:
+        id: a
+        text: A
+        start: "2026-05-01T00:00:00.000Z"
+        end: "2026-05-05T00:00:00.000Z"
+        parentId: p
+        noOverlap: true
+      task_b:
+        id: b
+        text: B
+        start: "2026-05-10T00:00:00.000Z"
+        end: "2026-05-20T00:00:00.000Z"
+        parentId: p
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: applyMoveConstraints
+    args:
+      - { ref: task_a }
+      - "2026-05-12T00:00:00.000Z"
+      - "2026-05-16T00:00:00.000Z"
+      - [{ ref: task_a }, { ref: task_b }]
+  then:
+    - probe: return.blocked
+      eq: true
+    - probe: return.start
+      eq: "2026-05-01T00:00:00.000Z"
+
+- id: locked-task-bar-has-data-attr
+  purpose: "A task bar with lockStart=true is discoverable via data-gantt-* attributes."
+  tags: [happy-path, introspection]
+  setup:
+    tasks:
+      - id: m
+        text: Milestone
+        start: "2026-05-20T00:00:00.000Z"
+        end: "2026-05-20T00:00:00.000Z"
+        lockStart: true
+        lockEnd: true
+        type: milestone
+        parentId: null
+        duration: 0
+        progress: 0
+        open: false
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '[data-gantt-role="milestone"][data-gantt-task-id="m"]'
+      eq: 1

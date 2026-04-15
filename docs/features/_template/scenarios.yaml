@@ -1,0 +1,27 @@
+# Given/When/Then scenarios. Each item is agent-executable.
+# The generic runner in tests/features.spec.ts enumerates these.
+
+- id: <scenario-slug>
+  purpose: <one sentence — what claim does this verify?>
+  tags: [happy-path]          # happy-path | edge | regression | a11y | perf
+  setup:
+    tasks: []                 # GanttTask[] — JSON-literal, dates as ISO strings
+    links: []
+    markers: []
+    config: {}                # Partial<GanttConfig>
+  when:
+    kind: render              # render | drag-simulate | unit-call | handle-method
+    # Optional extras depending on kind:
+    # target: '[data-gantt-task-id="a"]'   (for drag-simulate)
+    # deltaDays: 5
+    # module: "@bluemillstudio/gantt/store"
+    # fn: applyMoveConstraints
+    # args: [ref:task.a, ...]
+    # method: snapshot                     (for handle-method)
+  then:
+    - probe: dom.attribute
+      selector: '[data-gantt-role="task-bar"]'
+      attribute: data-gantt-task-id
+      expect: "a"
+    - probe: handle.validate
+      expect: { ok: true }
