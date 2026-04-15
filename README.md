@@ -469,6 +469,70 @@ import { rowAtY, cellAtX, barAtPoint, dateAtX } from '@bluemillstudio/gantt/stor
 
 These operate on plain layout data, so they're usable in SSR, workers, Node-based tests, and anywhere a store snapshot is available.
 
+## Computation layer (v0.8)
+
+Drive derived values and data transforms without touching the source tasks — the library runs your pipeline during `recalculate()` and stores the results on `task.$computed`.
+
+### computedFields
+
+```tsx
+<Gantt
+  tasks={tasks}
+  computedFields={[
+    { key: 'riskScore', compute: (t) => (t.slack ?? Infinity) < 2 ? 'high' : 'low' },
+    { key: 'cost',      compute: (t) => (t.hourlyRate ?? 0) * t.duration * 8 },
+    { key: 'variance',  compute: (t) =>
+        t.baseEnd ? (t.end.getTime() - t.baseEnd.getTime()) / 86_400_000 : null },
+  ]}
+/>
+```
+
+`task.$computed` is a `Record<string, unknown>` readable from `slots.renderTaskBar`, `slots.columns`, tooltips, and `snapshot()`.
+
+### summaryAggregators
+
+Custom roll-ups for summary tasks. They run after `computedFields` so aggregators can compose over derived values.
+
+```tsx
+<Gantt
+  summaryAggregators={{
+    totalCost: (children) =>
+      children.reduce((s, c) => s + Number(c.$computed?.cost ?? 0), 0),
+    worstRisk: (children) =>
+      children.some((c) => c.$computed?.riskScore === 'high') ? 'high' : 'ok',
+  }}
+/>
+```
+
+### Pure query helpers
+
+```ts
+import { filterTasks, sortTasks, groupTasksBy } from '@bluemillstudio/gantt/query';
+
+const active = filterTasks(tasks, { status: ['active', 'paused'], progressLte: 80 });
+const byStart = sortTasks(active, 'start', { by: 'progress', dir: 'desc' });
+const byOwner = groupTasksBy(active, (t) => t.projectId ?? '—');
+```
+
+### Analysis utilities
+
+```ts
+import { forecastEnd, resourceLoad, burndown } from '@bluemillstudio/gantt/analysis';
+
+forecastEnd(task);               // Date — linear ETA from current progress
+resourceLoad(tasks, {            // per-day histogram
+  weight: (t) => t.duration,
+  groupBy: (t) => t.projectId,
+});
+burndown(tasks);                 // [{ date, ideal, actual }]
+```
+
+All three are pure functions — safe in SSR, workers, and tests.
+
+### Out-of-scope (by design)
+
+The library does **not** fetch, cache, or persist data. Use TanStack Query / SWR / Apollo / your own layer for those; pipe the resulting task list in via the `tasks` prop.
+
 ## Headless Mode
 
 Use the store directly without the UI component — useful for server-side calculations or custom renderers:

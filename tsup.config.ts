@@ -4,6 +4,8 @@ export default defineConfig({
   entry: {
     index: 'src/index.ts',
     store: 'src/store/index.ts',  // separate entry for headless mode
+    query: 'src/query.ts',        // pure filter/sort helpers
+    analysis: 'src/analysis.ts',  // forecast / resourceLoad / burndown
   },
   format: ['cjs', 'esm'],
   dts: true,

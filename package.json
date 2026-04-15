@@ -1,6 +1,6 @@
 {
   "name": "@bluemillstudio/gantt",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Interactive Gantt chart component for React — drag & drop, dependencies, critical path, auto-scheduling",
   "author": "Blue Mill Studio",
   "license": "MIT",
@@ -48,6 +48,26 @@
       "require": {
         "types": "./dist/store.d.ts",
         "default": "./dist/store.js"
+      }
+    },
+    "./query": {
+      "import": {
+        "types": "./dist/query.d.mts",
+        "default": "./dist/query.mjs"
+      },
+      "require": {
+        "types": "./dist/query.d.ts",
+        "default": "./dist/query.js"
+      }
+    },
+    "./analysis": {
+      "import": {
+        "types": "./dist/analysis.d.mts",
+        "default": "./dist/analysis.mjs"
+      },
+      "require": {
+        "types": "./dist/analysis.d.ts",
+        "default": "./dist/analysis.js"
       }
     }
   },

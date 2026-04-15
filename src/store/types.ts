@@ -125,6 +125,13 @@ export interface GanttTask {
   /** Group identifier for multi-row mode. */
   $groupId?: string;
 
+  /**
+   * Optional bag of consumer-derived fields produced by the
+   * `computedFields` pipeline (v0.8). Keys and value types are defined
+   * by the consumer; the store treats these values as opaque.
+   */
+  $computed?: Record<string, unknown>;
+
   // ── Computed baseline visual properties (set by positionBaselines) ──
   /** Baseline bar pixel x-offset. */
   $bx?: number;
@@ -509,8 +516,16 @@ export interface GanttActions {
 
 // ━━━ GanttState ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// Compute-layer types re-exported for convenience.
+export type { ComputedField, SummaryAggregator } from './computation';
+import type { ComputedField, SummaryAggregator } from './computation';
+
 /** Full Zustand store shape: data + computed + UI + actions. */
 export interface GanttState extends GanttActions {
+  /** Consumer-defined derived-field pipeline (runs during recalculate). */
+  computedFields?: ComputedField[];
+  /** Consumer-defined aggregators applied to summary tasks. */
+  summaryAggregators?: Record<string, SummaryAggregator>;
   // ── Source data ───────────────────────────────────────────
   /** All tasks keyed by insertion order. */
   tasks: GanttTask[];
