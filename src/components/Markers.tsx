@@ -67,7 +67,13 @@ export function Markers() {
         const bgClass = getBgClass(marker.color);
 
         return (
-          <g key={marker.id}>
+          <g
+            key={marker.id}
+            data-gantt-role="marker"
+            data-gantt-marker-id={marker.id}
+            data-gantt-date={marker.date.toISOString()}
+            data-gantt-x={x}
+          >
             <line
               x1={x}
               y1={0}
@@ -99,7 +105,11 @@ export function Markers() {
 
       {/* Today marker — always shown when in range */}
       {showToday && (
-        <g>
+        <g
+          data-gantt-role="now-line"
+          data-gantt-date={today.toISOString()}
+          data-gantt-x={todayX}
+        >
           <line
             x1={todayX}
             y1={0}

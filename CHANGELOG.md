@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-04-15
+
+### Added — Introspection layer
+Purpose: give AI agents, Playwright tests, and advanced consumers a first-class way to "see" the chart without reading bespoke DOM.
+
+- **`data-gantt-*` attributes** on every semantic element: container, task-bar, milestone, summary, scale-cell, link, marker, now-line. Every instrumented node exposes its role, stable identifier, coordinates, and domain data (start/end ISO, category, status, critical, etc.). Works with any DOM querying tool out of the box.
+- **Pure hit-test helpers** exported from `@bluemillstudio/gantt/store`: `rowAtY`, `cellAtX`, `barAtPoint`, `dateAtX`. No DOM dependency — safe for SSR and tests.
+- **`GanttHandle` via `ref`** with methods: `snapshot()`, `elementAt(x,y)`, `rowAtY(y)`, `dateAtX(x)`, `cellAtX(x)`, `taskBarRect(id)`, `validate()`, `getElement()`. All return serializable JSON so agents and MCP tools can consume the output directly.
+- **Alignment validator** (`handle.validate()`) — reports out-of-bounds bars, negative widths, and scale-row width mismatches.
+
+### Changed (breaking for ref consumers only)
+- `<Gantt ref>` now yields a `GanttHandle` instead of the bare `HTMLDivElement`. Use `handle.getElement()` to get the div back. Given that forwardRef landed only in 0.5.0 with likely no external consumers, I'm treating this as a minor bump rather than major.
+
+### Example — agent inspection
+```ts
+import { Gantt, type GanttHandle } from '@bluemillstudio/gantt';
+
+const ref = useRef<GanttHandle>(null);
+<Gantt ref={ref} tasks={tasks} />
+
+// Somewhere else
+const layout = ref.current?.snapshot();
+console.log(layout.bars); // [{ taskId, x, y, w, h, start, end, ... }]
+
+// Or from Playwright:
+await page.$$eval('[data-gantt-role="task-bar"]', (els) =>
+  els.map((e) => (e as HTMLElement).dataset));
+```
+
 ## [0.6.1] - 2026-04-15
 
 ### Added

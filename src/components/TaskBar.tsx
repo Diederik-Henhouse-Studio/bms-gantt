@@ -65,6 +65,14 @@ function MilestoneBar({ task, isSelected, readonly, onSelect, onDoubleClick, onD
 
   return (
     <div
+      data-gantt-role="milestone"
+      data-gantt-task-id={task.id}
+      data-gantt-x={task.$x - size / 2}
+      data-gantt-y={task.$y + (task.$h - size) / 2}
+      data-gantt-w={size}
+      data-gantt-h={size}
+      data-gantt-start={task.start.toISOString()}
+      data-gantt-critical={task.critical ? 'true' : undefined}
       className="absolute"
       style={{
         left: task.$x - size / 2,
@@ -102,6 +110,14 @@ function SummaryBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
 
   return (
     <div
+      data-gantt-role="summary"
+      data-gantt-task-id={task.id}
+      data-gantt-x={task.$x}
+      data-gantt-y={task.$y + (task.$h - barHeight) / 2}
+      data-gantt-w={task.$w}
+      data-gantt-h={barHeight + triangleSize}
+      data-gantt-start={task.start.toISOString()}
+      data-gantt-end={task.end.toISOString()}
       className="absolute"
       style={{
         left: task.$x,
@@ -194,6 +210,22 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
 
   return (
     <div
+      data-gantt-role="task-bar"
+      data-gantt-task-id={task.id}
+      data-gantt-x={task.$x}
+      data-gantt-y={task.$y}
+      data-gantt-w={task.$w}
+      data-gantt-h={task.$h}
+      data-gantt-start={task.start.toISOString()}
+      data-gantt-end={task.end.toISOString()}
+      data-gantt-level={task.$level}
+      data-gantt-type={task.type}
+      data-gantt-category={task.taskCategory ?? undefined}
+      data-gantt-status={task.status ?? undefined}
+      data-gantt-critical={isCritical ? 'true' : undefined}
+      data-gantt-selected={isSelected ? 'true' : undefined}
+      data-gantt-lane={task.$lane ?? undefined}
+      data-gantt-group={task.$groupId ?? undefined}
       className={cn(
         'absolute rounded-sm overflow-hidden select-none',
         !colors.custom && colors.bg,
