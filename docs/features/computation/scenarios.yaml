@@ -1,0 +1,63 @@
+- id: computedfield-populates-computed
+  purpose: "applyComputedFields writes results under task.$computed[key]."
+  tags: [happy-path, unit]
+  setup:
+    fixtures:
+      task_a:
+        id: a
+        text: A
+        progress: 40
+        start: "2026-05-01T00:00:00.000Z"
+        end: "2026-05-05T00:00:00.000Z"
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: applyComputedFields
+    args:
+      - [{ ref: task_a }]
+      - [ { key: "done", compute: "t => t.progress >= 100" } ]
+  then:
+    - probe: return[0].$computed.done
+      eq: false
+
+- id: compute-failure-is-isolated
+  purpose: "A compute that throws does not crash the pipeline."
+  tags: [edge, unit]
+  setup:
+    fixtures:
+      task_a: { id: a, text: A, progress: 0,
+        start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: applyComputedFields
+    args:
+      - [{ ref: task_a }]
+      - [ { key: "bad", compute: "() => { throw new Error('x') }" } ]
+  then:
+    - probe: return[0].$computed.bad
+      eq: null
+    - probe: console.warnings
+      gte: 1
+
+- id: summary-aggregator-sums-children
+  purpose: "applySummaryAggregators rolls up numeric values from direct children."
+  tags: [happy-path, unit]
+  setup:
+    fixtures:
+      parent: { id: p, text: Parent, type: summary, parentId: null,
+        start: "2026-05-01T00:00:00.000Z", end: "2026-05-10T00:00:00.000Z" }
+      child_a: { id: ca, text: A, parentId: p, duration: 3,
+        start: "2026-05-01T00:00:00.000Z", end: "2026-05-04T00:00:00.000Z" }
+      child_b: { id: cb, text: B, parentId: p, duration: 7,
+        start: "2026-05-04T00:00:00.000Z", end: "2026-05-11T00:00:00.000Z" }
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: applySummaryAggregators
+    args:
+      - [{ ref: parent }, { ref: child_a }, { ref: child_b }]
+      - { totalDuration: "children => children.reduce((s,c)=>s+c.duration,0)" }
+  then:
+    - probe: return[0].$computed.totalDuration
+      eq: 10

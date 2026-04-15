@@ -1,0 +1,29 @@
+- id: holiday-treated-as-non-working
+  purpose: "A configured holiday is not a working day."
+  tags: [happy-path, unit]
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: createCalendar
+    args:
+      - { workingDays: [1,2,3,4,5], holidays: ["2026-05-05T00:00:00.000Z"] }
+    then_method: isWorkingDay
+    then_args: ["2026-05-05T00:00:00.000Z"]
+  then:
+    - probe: return
+      eq: false
+
+- id: default-calendar-treats-weekend-as-non-working
+  purpose: "Default config excludes Sat/Sun."
+  tags: [happy-path, unit]
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: createCalendar
+    args:
+      - { workingDays: [1,2,3,4,5], holidays: [] }
+    then_method: isWorkingDay
+    then_args: ["2026-05-03T00:00:00.000Z"]     # a Sunday
+  then:
+    - probe: return
+      eq: false

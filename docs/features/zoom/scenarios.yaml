@@ -1,0 +1,38 @@
+- id: setzoom-replaces-scales
+  purpose: "setZoom('days') swaps scales and cellWidth to the days preset."
+  tags: [happy-path, unit]
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: "ZOOM_PRESETS.days"
+  then:
+    - probe: return.cellWidth
+      eq: 32
+    - probe: return.scales.length
+      gte: 2
+
+- id: minutes-preset-has-minute-unit
+  purpose: "The minutes preset contains a minute-unit scale row."
+  tags: [happy-path, unit]
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: "ZOOM_PRESETS.minutes"
+  then:
+    - probe: return.scales
+      contains_object: { unit: "minute" }
+
+- id: invalid-zoom-level-warns
+  purpose: "Calling setZoom with an unknown value logs a warning and leaves state intact."
+  tags: [edge, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-10T00:00:00.000Z",
+          duration: 9, progress: 0, parentId: null, type: task, open: false }
+  when:
+    kind: handle-method
+    method: setZoom           # requires GanttHandle.setZoom shim — see introspection TODO
+    args: ["banana"]
+  then:
+    - probe: console.warnings
+      gte: 1

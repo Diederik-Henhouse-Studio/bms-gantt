@@ -1,0 +1,24 @@
+id: i18n
+kind: prop-slot
+applies_to: Gantt props
+
+exports:
+  - kind: type
+    name: GanttLabels
+    path: "@bluemillstudio/gantt"
+    description: "Full record of overridable UI strings. See src/i18n.tsx for the authoritative keys."
+  - kind: value
+    name: DEFAULT_LABELS
+    path: "@bluemillstudio/gantt"
+    description: "Immutable default English strings."
+
+invariants:
+  - when: "labels prop is omitted"
+    guarantee: "UI renders with DEFAULT_LABELS verbatim (English)."
+  - when: "labels.today is set to a string"
+    guarantee: "The today badge and the 'Go to today' button expose that exact string."
+  - when: "labels.zoomLevels.weeks is set"
+    guarantee: "The toolbar's zoom-level display reads that value when zoomLevel === 'weeks'."
+
+depends_on: []
+breaking_changes: []

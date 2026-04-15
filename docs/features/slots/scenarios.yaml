@@ -1,0 +1,47 @@
+- id: custom-task-bar-renders
+  purpose: "slots.renderTaskBar replaces inner content while preserving the outer wrapper."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+    slots_fixture: "custom-bar"     # runner mounts a known slot — see examples/
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '[data-gantt-role="task-bar"][data-gantt-task-id="a"]'
+      eq: 1
+    - probe: dom.text
+      selector: '[data-gantt-role="task-bar"] [data-test="custom"]'
+      eq: "A · 0%"
+
+- id: custom-columns-replace-defaults
+  purpose: "slots.columns replaces the built-in column set."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+    slots_fixture: "single-column"
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: 'th'
+      eq: 1
+
+- id: tooltip-default-when-slot-omitted
+  purpose: "Hovering a bar without a tooltip slot shows the default tooltip."
+  tags: [happy-path, interaction]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 50, parentId: null, type: task, open: false }
+  when:
+    kind: hover
+    target: '[data-gantt-task-id="a"]'
+  then:
+    - probe: dom.text
+      selector: '[data-gantt-role="task-bar"] div.whitespace-nowrap'
+      match: "A"

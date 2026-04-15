@@ -1,0 +1,45 @@
+- id: default-today-label-english
+  purpose: "The today badge renders 'Today' when labels are not overridden."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "__REL_DAYS__:-5", end: "__REL_DAYS__:+5",
+          duration: 10, progress: 0, parentId: null, type: task, open: false }
+  when:
+    kind: render
+  then:
+    - probe: dom.text
+      selector: '[data-gantt-role="now-line"] span'
+      eq: "Today"
+
+- id: custom-label-override-applied
+  purpose: "Passing labels.today overrides the default badge copy."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "__REL_DAYS__:-5", end: "__REL_DAYS__:+5",
+          duration: 10, progress: 0, parentId: null, type: task, open: false }
+    labels:
+      today: "Vandaag"
+  when:
+    kind: render
+  then:
+    - probe: dom.text
+      selector: '[data-gantt-role="now-line"] span'
+      eq: "Vandaag"
+
+- id: partial-override-preserves-other-keys
+  purpose: "Overriding one key does not reset the rest."
+  tags: [edge]
+  setup:
+    tasks: []
+    labels:
+      today: "Heute"
+  when:
+    kind: handle-method
+    method: getLabels        # convenience; see feature.md — may require a tiny API addition
+  then:
+    - probe: return.today
+      eq: "Heute"
+    - probe: return.cancel
+      eq: "Cancel"

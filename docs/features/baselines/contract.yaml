@@ -1,0 +1,29 @@
+id: baselines
+kind: prop-field
+applies_to: GanttTask + GanttConfig
+
+exports:
+  - kind: type
+    name: GanttTask
+    path: "@bluemillstudio/gantt"
+    fields:
+      - { name: baseStart, type: "Date | undefined" }
+      - { name: baseEnd,   type: "Date | undefined" }
+  - kind: type
+    name: GanttConfig
+    path: "@bluemillstudio/gantt"
+    fields:
+      - { name: showBaselines, type: boolean, default: false }
+
+invariants:
+  - when: "showBaselines = true AND task has baseStart and baseEnd"
+    guarantee: "A baseline element is rendered with $bx, $by, $bw, $bh populated."
+  - when: "task.baseStart or baseEnd is missing"
+    guarantee: "No baseline element renders for that task, regardless of showBaselines."
+
+depends_on:
+  - state-management
+breaking_changes:
+  - version: 0.5.0
+    change: "Baseline now renders as a full-height striped shadow behind the live bar (previously a 4-px strip below)."
+    migration: "No code change; visuals differ."

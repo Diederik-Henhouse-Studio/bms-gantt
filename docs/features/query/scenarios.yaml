@@ -1,0 +1,44 @@
+- id: filter-by-status-array
+  purpose: "Status filter accepts an array and matches any."
+  tags: [happy-path, unit]
+  setup:
+    fixtures:
+      ta: { id: a, text: A, status: active,    start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+      tb: { id: b, text: B, status: completed, start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+      tc: { id: c, text: C, status: paused,    start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/query"
+    fn: filterTasks
+    args:
+      - [{ ref: ta }, { ref: tb }, { ref: tc }]
+      - { status: [active, paused] }
+  then:
+    - probe: return.length
+      eq: 2
+    - probe: return[0].id
+      eq: a
+
+- id: sort-multi-key
+  purpose: "Multi-key sort: text asc, then progress desc."
+  tags: [happy-path, unit]
+  setup:
+    fixtures:
+      t1: { id: "1", text: X, progress: 50, start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+      t2: { id: "2", text: Y, progress: 50, start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+      t3: { id: "3", text: X, progress: 10, start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/query"
+    fn: sortTasks
+    args:
+      - [{ ref: t1 }, { ref: t2 }, { ref: t3 }]
+      - "text"
+      - { by: progress, dir: desc }
+  then:
+    - probe: return[0].id
+      eq: "1"
+    - probe: return[1].id
+      eq: "3"
+    - probe: return[2].id
+      eq: "2"

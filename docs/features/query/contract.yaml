@@ -1,0 +1,35 @@
+id: query
+kind: sub-export
+applies_to: "@bluemillstudio/gantt/query"
+
+exports:
+  - kind: function
+    name: filterTasks
+    signature: "(tasks: GanttTask[], f: TaskFilter) => GanttTask[]"
+  - kind: function
+    name: sortTasks
+    signature: "(tasks: GanttTask[], ...specs: (SortKey | SortSpec)[]) => GanttTask[]"
+  - kind: function
+    name: groupTasksBy
+    signature: "<K>(tasks: GanttTask[], keyOf: (t: GanttTask) => K) => Map<K, GanttTask[]>"
+  - kind: type
+    name: TaskFilter
+    fields:
+      - { name: text,        type: "string | undefined",                description: "Case-insensitive substring on text." }
+      - { name: status,      type: "TaskStatus | TaskStatus[] | undefined" }
+      - { name: category,    type: "TaskCategory | TaskCategory[] | undefined" }
+      - { name: overlaps,    type: "{ start: Date; end: Date } | undefined" }
+      - { name: progressGte, type: "number | undefined" }
+      - { name: progressLte, type: "number | undefined" }
+      - { name: critical,    type: "boolean | undefined" }
+      - { name: parentIdIn,  type: "(string | null)[] | undefined" }
+      - { name: where,       type: "((t: GanttTask) => boolean) | undefined" }
+
+invariants:
+  - when: "filter is an empty object"
+    guarantee: "filterTasks returns a new array equal to the input."
+  - when: "sortTasks is called"
+    guarantee: "Input array is not mutated; output is a fresh array."
+
+depends_on: []
+breaking_changes: []

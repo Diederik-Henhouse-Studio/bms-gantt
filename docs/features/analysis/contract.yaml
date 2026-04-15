@@ -1,0 +1,27 @@
+id: analysis
+kind: sub-export
+applies_to: "@bluemillstudio/gantt/analysis"
+
+exports:
+  - kind: function
+    name: forecastEnd
+    signature: "(task: GanttTask, now?: Date) => Date"
+  - kind: function
+    name: resourceLoad
+    signature: "(tasks: GanttTask[], opts?: ResourceLoadOptions) => LoadBucket[]"
+  - kind: function
+    name: burndown
+    signature: "(tasks: GanttTask[], opts?: { start?: Date; end?: Date }) => BurndownPoint[]"
+
+invariants:
+  - when: "task.progress is 0"
+    guarantee: "forecastEnd returns task.end unchanged."
+  - when: "task.progress is 100"
+    guarantee: "forecastEnd returns task.end unchanged."
+  - when: "resourceLoad receives an empty array"
+    guarantee: "Returns an empty array."
+  - when: "burndown is called on a non-empty task list"
+    guarantee: "First ideal value == total duration, last ideal value == 0."
+
+depends_on: []
+breaking_changes: []

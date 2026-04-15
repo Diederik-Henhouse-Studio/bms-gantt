@@ -1,0 +1,30 @@
+id: calendar
+kind: behavior
+applies_to: GanttConfig
+
+exports:
+  - kind: type
+    name: GanttConfig
+    fields:
+      - { name: workingDays, type: "number[]", default: "[1,2,3,4,5]", description: "ISO weekday numbers (1=Mon, 7=Sun) counted as working." }
+      - { name: holidays,    type: "Date[]",   default: "[]",         description: "Non-working dates; compared by local date." }
+  - kind: type
+    name: GanttCalendar
+    path: "@bluemillstudio/gantt/store"
+    methods:
+      - { name: isWorkingDay, signature: "(d: Date) => boolean" }
+      - { name: addWorkingDays, signature: "(d: Date, n: number) => Date" }
+      - { name: countWorkingDays, signature: "(a: Date, b: Date) => number" }
+  - kind: function
+    name: createCalendar
+    path: "@bluemillstudio/gantt/store"
+    signature: "(config: Pick<GanttConfig, 'workingDays' | 'holidays'>) => GanttCalendar"
+
+invariants:
+  - when: "holidays contains a date d"
+    guarantee: "calendar.isWorkingDay(d) === false regardless of its weekday."
+  - when: "a scale cell falls on a holiday"
+    guarantee: "ScaleCell.isHoliday === true AND DOM has data-gantt-holiday=\"true\"."
+
+depends_on: []
+breaking_changes: []

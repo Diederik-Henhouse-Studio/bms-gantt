@@ -1,0 +1,51 @@
+- id: removetasks-clears-orphan-links
+  purpose: "Removing a task also drops any link referencing it."
+  tags: [happy-path, unit]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+      - { id: b, text: B, start: "2026-05-05T00:00:00.000Z", end: "2026-05-10T00:00:00.000Z",
+          duration: 5, progress: 0, parentId: null, type: task, open: false }
+    links:
+      - { id: l1, source: a, target: b, type: e2s }
+  when:
+    kind: handle-method
+    method: removeTasks
+    args: [["a"]]
+  then:
+    - probe: handle.snapshot.bars.length
+      eq: 1
+    - probe: handle.snapshot.links.length
+      eq: 0
+
+- id: shifttasks-respects-lockstart
+  purpose: "shiftTasks does not move a locked-start task."
+  tags: [edge, unit]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false, lockStart: true }
+  when:
+    kind: handle-method
+    method: shiftTasks
+    args: [["a"], 3]
+  then:
+    - probe: handle.snapshot.bars[0].start
+      eq: "2026-05-01T00:00:00.000Z"
+
+- id: delete-key-removes-selection
+  purpose: "Pressing Delete with a selection triggers removeTasks."
+  tags: [happy-path, interaction]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+    seed_store:
+      selectedTaskIds: ["a"]
+  when:
+    kind: keydown
+    key: Delete
+  then:
+    - probe: handle.snapshot.bars.length
+      eq: 0

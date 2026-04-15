@@ -1,0 +1,25 @@
+id: undo-redo
+kind: behavior
+applies_to: store actions + keyboard
+
+exports:
+  - kind: function
+    name: useTemporalStore
+    path: "@bluemillstudio/gantt/store"
+    description: "Hook exposing zundo's temporal store (past/future stacks, undo(), redo(), pause(), resume())."
+  - kind: function
+    name: createGanttStore
+    path: "@bluemillstudio/gantt/store"
+    description: "Factory that creates an isolated store instance with its own history."
+
+invariants:
+  - when: "Ctrl/Cmd + Z is pressed with a non-empty past stack"
+    guarantee: "State returns to the previous data snapshot; UI state is preserved."
+  - when: "bulk mutations (e.g. removeTasks) run"
+    guarantee: "Exactly one history entry is pushed."
+  - when: "recalculate() runs"
+    guarantee: "Its internal set() calls do not create history entries."
+
+depends_on:
+  - state-management
+breaking_changes: []

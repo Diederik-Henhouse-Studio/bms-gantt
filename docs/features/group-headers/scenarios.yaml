@@ -1,0 +1,36 @@
+- id: single-row-has-no-group-headers
+  purpose: "With rowMode: 'single' no group headers render."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+    config:
+      rowMode: single
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '.gantt-container > * text, .gantt-container span.bg-background\\/80'
+      eq: 0
+
+- id: multi-row-labels-match-groups
+  purpose: "One header banner per task group with the group label."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, parentId: p1, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, type: task, open: false }
+      - { id: b, text: B, parentId: p1, start: "2026-05-02T00:00:00.000Z", end: "2026-05-06T00:00:00.000Z",
+          duration: 4, progress: 0, type: task, open: false }
+      - { id: p1, text: "Team Alpha", parentId: null, start: "2026-05-01T00:00:00.000Z", end: "2026-05-10T00:00:00.000Z",
+          duration: 9, progress: 0, type: summary, open: true }
+    config:
+      rowMode: multi
+      groupBy: parentId
+  when:
+    kind: render
+  then:
+    - probe: dom.text
+      selector: '.gantt-container span.bg-background\\/80'
+      match: "Team Alpha"
