@@ -105,6 +105,7 @@ export function Markers() {
             y1={0}
             x2={todayX}
             y2={totalHeight}
+            stroke="var(--gantt-today-color, currentColor)"
             className="stroke-primary"
             strokeWidth={2}
             strokeDasharray="4 4"
@@ -116,7 +117,13 @@ export function Markers() {
             height={22}
           >
             <div className="flex justify-center">
-              <span className="bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded-full whitespace-nowrap leading-none">
+              <span
+                className="text-xs px-1.5 py-0.5 rounded-full whitespace-nowrap leading-none"
+                style={{
+                  background: 'var(--gantt-today-color, hsl(var(--primary)))',
+                  color: 'var(--gantt-today-fg, hsl(var(--primary-foreground)))',
+                }}
+              >
                 {labels.today}
               </span>
             </div>
