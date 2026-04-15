@@ -9,6 +9,7 @@ import { useGanttStore } from '../store';
 import type { GanttTask, DragState } from '../store';
 import { TaskBar } from './TaskBar';
 import { GroupHeaders } from './GroupHeaders';
+import { useLabels } from '../i18n';
 
 // ── Props ──────────────────────────────────────────────────────
 
@@ -33,6 +34,7 @@ export function TaskBars({ readonly, onTaskClick, onTaskDoubleClick }: TaskBarsP
   const scrollTop = useGanttStore((s) => s.scrollTop);
   const config = useGanttStore((s) => s.config);
   const dragState = useGanttStore((s) => s.dragState);
+  const labels = useLabels();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
@@ -184,9 +186,15 @@ export function TaskBars({ readonly, onTaskClick, onTaskDoubleClick }: TaskBarsP
     <div
       ref={containerRef}
       className="relative"
-      style={{ width: totalWidth, height: totalHeight }}
+      style={{ width: totalWidth, height: Math.max(totalHeight, 120) }}
     >
       <GroupHeaders />
+
+      {flatTasks.length === 0 && (
+        <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground pointer-events-none select-none">
+          {labels.emptyState}
+        </div>
+      )}
 
       {visibleTasks.map((task) => (
         <TaskBar

@@ -142,16 +142,25 @@ export function DependencyLinks() {
             : 'url(#arrowhead)';
 
         return (
-          <polyline
-            key={link.id}
-            points={link.$points}
-            fill="none"
-            strokeWidth={isSelected ? 2.5 : 1.5}
-            className={`${strokeClass} cursor-pointer hover:stroke-primary transition-colors`}
-            markerEnd={markerEnd}
-            pointerEvents="stroke"
-            onClick={handleLinkClick(link.id)}
-          />
+          <g key={link.id}>
+            {/* Invisible wider hit area so thin links stay easy to click */}
+            <polyline
+              points={link.$points}
+              fill="none"
+              stroke="transparent"
+              strokeWidth={10}
+              pointerEvents="stroke"
+              className="cursor-pointer"
+              onClick={handleLinkClick(link.id)}
+            />
+            <polyline
+              points={link.$points}
+              fill="none"
+              strokeWidth={isSelected ? 2.5 : 2}
+              className={`${strokeClass} pointer-events-none transition-colors`}
+              markerEnd={markerEnd}
+            />
+          </g>
         );
       })}
 

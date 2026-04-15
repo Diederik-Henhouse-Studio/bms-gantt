@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-04-15
+
+### Added
+- **Empty-state placeholder** — when no tasks are supplied, the chart shows a centered "No tasks to display" message. Overridable via `labels.emptyState`.
+
+### Changed
+- **Milestone diamond size now adapts** to row height with a 14–24 px clamp; no longer invisible on coarse zooms.
+- **Progress handle is larger (3.5 × 3.5 px → 14 × 14 px)** with a hover-scale effect and a primary-colour border on hover.
+- **Dependency arrows** get an invisible 10 px hit area so thin lines stay clickable, and the visible stroke is thicker (1.5 → 2 px).
+
 ## [0.6.0] - 2026-04-15
 
 ### Added

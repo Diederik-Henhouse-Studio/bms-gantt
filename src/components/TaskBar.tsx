@@ -60,7 +60,8 @@ function getCategoryColors(task: GanttTask) {
 
 function MilestoneBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDragStart }: TaskBarProps) {
   const colors = getCategoryColors(task);
-  const size = 14;
+  // Enforce a readable minimum regardless of zoom level.
+  const size = Math.max(14, Math.min(24, task.$h - 4));
 
   return (
     <div
@@ -273,10 +274,10 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
           {/* Progress handle */}
           <div
             data-handle="progress"
-            className="absolute z-20 w-2.5 h-2.5 rounded-full bg-white border-2 border-gray-500 cursor-ew-resize"
+            className="absolute z-20 w-3.5 h-3.5 rounded-full bg-white border-2 border-gray-500 hover:border-primary hover:scale-125 transition-transform cursor-ew-resize shadow"
             style={{
               left: `${progressPct}%`,
-              bottom: -2,
+              bottom: -4,
               transform: 'translateX(-50%)',
             }}
             onMouseDown={(e) => {

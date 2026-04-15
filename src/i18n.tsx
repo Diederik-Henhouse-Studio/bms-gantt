@@ -41,6 +41,7 @@ export interface GanttLabels {
   category: string;
   notes: string;
   close: string;
+  emptyState: string;
   columnTask: string;
   columnStart: string;
   columnEnd: string;
@@ -91,6 +92,7 @@ export const DEFAULT_LABELS: GanttLabels = {
   category: 'Category',
   notes: 'Notes',
   close: 'Close',
+  emptyState: 'No tasks to display',
   columnTask: 'Task',
   columnStart: 'Start',
   columnEnd: 'End',
