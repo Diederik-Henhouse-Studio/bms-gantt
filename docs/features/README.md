@@ -25,6 +25,7 @@ Copy [`_template/`](./_template) to start a new feature.
 
 ## Catalog
 
+<!-- catalog:start -->
 | Feature | Status | Since | Category |
 |---------|--------|-------|----------|
 | [analysis](./analysis) | 🟢 | 0.8.0 | data |
@@ -32,6 +33,7 @@ Copy [`_template/`](./_template) to start a new feature.
 | [bulk-ops](./bulk-ops) | 🟢 | 0.4.0 | interaction |
 | [calendar](./calendar) | 🟢 | 0.1.0 | scheduling |
 | [computation](./computation) | 🟢 | 0.8.0 | data |
+| [core-types](./core-types) | 🟢 | 0.1.0 | meta |
 | [drag-constraints](./drag-constraints) | 🟢 | 0.3.0 | interaction |
 | [group-headers](./group-headers) | 🟢 | 0.5.2 | presentation |
 | [i18n](./i18n) | 🟢 | 0.2.0 | presentation |
@@ -42,7 +44,7 @@ Copy [`_template/`](./_template) to start a new feature.
 | [theming](./theming) | 🟢 | 0.6.0 | presentation |
 | [undo-redo](./undo-redo) | 🟢 | 0.1.0 | interaction |
 | [zoom](./zoom) | 🟢 | 0.2.0 | presentation |
-
+<!-- catalog:end -->
 ## How to run scenarios
 
 Scenarios live in each `scenarios.yaml`. The generic runner at [`tests/features.spec.ts`](../../tests/features.spec.ts) reads every scenarios file, seeds the Gantt, executes the `when` step, and asserts each `then` probe.
