@@ -12,6 +12,15 @@ exports:
   - kind: function
     name: burndown
     signature: "(tasks: GanttTask[], opts?: { start?: Date; end?: Date }) => BurndownPoint[]"
+  - kind: type
+    name: LoadBucket
+    description: "One per-day histogram bucket from resourceLoad."
+  - kind: type
+    name: ResourceLoadOptions
+    description: "Options for resourceLoad (start/end/weight/groupBy)."
+  - kind: type
+    name: BurndownPoint
+    description: "One { date, ideal, actual } entry from burndown."
 
 invariants:
   - when: "task.progress is 0"

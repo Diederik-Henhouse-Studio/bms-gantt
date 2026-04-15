@@ -18,6 +18,7 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run typecheck:examples
+      - run: npm run check:contract-coverage
       - run: npm run test:coverage
       - run: npm run build
       - uses: actions/upload-artifact@v4

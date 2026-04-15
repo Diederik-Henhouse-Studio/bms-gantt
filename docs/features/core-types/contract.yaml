@@ -1,0 +1,44 @@
+id: core-types
+kind: type
+applies_to: "@bluemillstudio/gantt"
+
+exports:
+  # Runtime components
+  - { kind: component, name: Gantt,                  path: "@bluemillstudio/gantt" }
+  - { kind: component, name: GanttErrorBoundary,     path: "@bluemillstudio/gantt" }
+  - { kind: function,  name: validateGanttInput,     path: "@bluemillstudio/gantt" }
+
+  # Props / config
+  - { kind: type, name: GanttProps,                  path: "@bluemillstudio/gantt" }
+  - { kind: type, name: GanttErrorBoundaryProps,     path: "@bluemillstudio/gantt" }
+  - { kind: type, name: GanttConfig,                 path: "@bluemillstudio/gantt" }
+  - { kind: type, name: ValidationResult,            path: "@bluemillstudio/gantt" }
+
+  # Data shapes
+  - { kind: type, name: GanttLink,                   path: "@bluemillstudio/gantt" }
+  - { kind: type, name: GanttMarker,                 path: "@bluemillstudio/gantt" }
+  - { kind: type, name: GanttScale,                  path: "@bluemillstudio/gantt" }
+  - { kind: type, name: ScaleCell,                   path: "@bluemillstudio/gantt" }
+  - { kind: type, name: LaneGroup,                   path: "@bluemillstudio/gantt" }
+  - { kind: type, name: DateRange,                   path: "@bluemillstudio/gantt" }
+
+  # State + actions (advanced / headless mode)
+  - { kind: type, name: GanttState,                  path: "@bluemillstudio/gantt" }
+  - { kind: type, name: GanttActions,                path: "@bluemillstudio/gantt" }
+  - { kind: type, name: DragState,                   path: "@bluemillstudio/gantt" }
+
+  # Enums (exported as string unions)
+  - { kind: type, name: TaskType,                    path: "@bluemillstudio/gantt" }
+  - { kind: type, name: TaskCategory,                path: "@bluemillstudio/gantt" }
+  - { kind: type, name: TaskStatus,                  path: "@bluemillstudio/gantt" }
+  - { kind: type, name: LinkType,                    path: "@bluemillstudio/gantt" }
+  - { kind: type, name: ZoomLevel,                   path: "@bluemillstudio/gantt" }
+  - { kind: type, name: ZoomConfig,                  path: "@bluemillstudio/gantt" }
+  - { kind: type, name: ScaleUnit,                   path: "@bluemillstudio/gantt" }
+
+invariants:
+  - when: "the library is imported"
+    guarantee: "All names listed above are available via a single root import."
+
+depends_on: []
+breaking_changes: []
