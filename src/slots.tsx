@@ -15,6 +15,12 @@ export interface GanttSlots {
    */
   renderTaskBar?: (task: GanttTask) => ReactNode;
   /**
+   * Custom tooltip shown on task-bar hover. Return `null` or `undefined`
+   * to suppress the tooltip for a given task. When omitted, a compact
+   * default tooltip with start/end/progress is rendered.
+   */
+  renderTaskTooltip?: (task: GanttTask) => ReactNode;
+  /**
    * Override the content of a timeline header cell. Receives the cell and
    * its row index (0 = top row). Return a ReactNode rendered in place of
    * the default cell label.

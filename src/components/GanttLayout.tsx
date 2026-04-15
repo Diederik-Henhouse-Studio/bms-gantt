@@ -14,8 +14,8 @@ import GanttToolbar from './GanttToolbar';
 
 // ── Constants ────────────────────────────────────────────────
 
-const GRID_DEFAULT_WIDTH = 300;
-const GRID_MIN_WIDTH = 200;
+const GRID_DEFAULT_WIDTH = 420;
+const GRID_MIN_WIDTH = 220;
 const GRID_MAX_WIDTH = 500;
 const DIVIDER_WIDTH = 4;
 
@@ -38,6 +38,8 @@ export function GanttLayout({
   onLinkCreate,
   onLinkDelete,
 }: GanttLayoutProps) {
+  const showToolbar = useGanttStore((s) => s.config.showToolbar);
+
   // ── Grid width (local state) ───────────────────────────────
 
   const [gridWidth, setGridWidth] = useState(GRID_DEFAULT_WIDTH);
@@ -174,8 +176,8 @@ export function GanttLayout({
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      {/* ── Toolbar ─────────────────────────────────────────── */}
-      <GanttToolbar chartRef={chartContainerRef} />
+      {/* ── Toolbar (hidden when config.showToolbar === false) */}
+      {showToolbar && <GanttToolbar chartRef={chartContainerRef} />}
 
       {/* ── Content area: grid + divider + chart ────────────── */}
       <div className="flex flex-1 min-h-0">

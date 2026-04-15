@@ -72,6 +72,7 @@ export function createConfig(overrides?: Partial<GanttConfig>): GanttConfig {
     showBaselines: false,
     showCriticalPath: false,
     showSlack: false,
+    showToolbar: true,
     workingDays: [1, 2, 3, 4, 5],
     holidays: [],
     ...overrides,

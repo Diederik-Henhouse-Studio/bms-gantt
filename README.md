@@ -175,6 +175,7 @@ export default function Planning() {
 | `showBaselines` | `boolean` | `false` | Render baseline (shadow) bars |
 | `showCriticalPath` | `boolean` | `false` | Highlight the critical path in red |
 | `showSlack` | `boolean` | `false` | Show slack/float indicators |
+| `showToolbar` | `boolean` | `true` | Render the built-in toolbar (zoom, today, export, etc.) |
 | `workingDays` | `number[]` | `[1,2,3,4,5]` | ISO weekday numbers (1=Mon, 7=Sun) |
 | `holidays` | `Date[]` | `[]` | Non-working dates |
 
@@ -330,6 +331,13 @@ const slots: GanttSlots = {
   // Override the timeline header cell content
   renderHeaderCell: (cell, rowIndex) => (
     <span className={rowIndex === 0 ? 'font-mono' : ''}>{cell.label}</span>
+  ),
+  // Custom hover tooltip
+  renderTaskTooltip: (task) => (
+    <div>
+      <strong>{task.text}</strong>
+      <div>{task.progress}% complete</div>
+    </div>
   ),
 };
 
