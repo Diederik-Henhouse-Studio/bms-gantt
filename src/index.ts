@@ -38,5 +38,17 @@ export { DEFAULT_LABELS } from './i18n';
 // Customisation slots
 export type { GanttSlots } from './slots';
 
+// Introspection (for agents, tests, advanced consumers)
+export type {
+  GanttHandle,
+  LayoutSnapshot,
+  LayoutBar,
+  LayoutScaleCell,
+  LayoutLink,
+  LayoutMarker,
+  AlignmentReport,
+  AlignmentIssue,
+} from './handle';
+
 // Presets (example domain integration)
 export * from './presets';

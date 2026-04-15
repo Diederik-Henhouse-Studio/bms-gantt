@@ -79,3 +79,11 @@ export {
   calcCriticalPath,
   calcSlack,
 } from './scheduling';
+
+// Hit-test helpers (pure, no DOM)
+export {
+  rowAtY,
+  cellAtX,
+  barAtPoint,
+  dateAtX,
+} from './hitTest';

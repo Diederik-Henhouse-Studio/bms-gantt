@@ -59,6 +59,14 @@ export const TimeScale: React.FC<TimeScaleProps> = ({ scaleCells, totalWidth }) 
                 return (
                   <div
                     key={cell.key}
+                    data-gantt-role="scale-cell"
+                    data-gantt-scale-row={rowIndex}
+                    data-gantt-unit={cell.unit}
+                    data-gantt-date={cell.date.toISOString()}
+                    data-gantt-w={cell.width}
+                    data-gantt-weekend={cell.isWeekend ? 'true' : undefined}
+                    data-gantt-holiday={cell.isHoliday ? 'true' : undefined}
+                    data-gantt-today={cell.isToday ? 'true' : undefined}
                     className={cellClasses.join(' ')}
                     style={{ width: cell.width, minWidth: cell.width }}
                   >

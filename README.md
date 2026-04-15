@@ -416,6 +416,59 @@ Task bar colours are resolved in this order:
 2. `task.taskCategory` via `TASK_CATEGORY_COLORS` — domain colours
 3. Default theme colour
 
+## Introspection for agents & tests
+
+Every rendered element carries `data-gantt-*` attributes that describe its role and coordinates in a stable, serializable form. Combined with the imperative `ref` handle, this makes the chart programmatically legible to AI agents, Playwright suites, and custom tooling — no screenshot parsing required.
+
+### DOM attributes
+
+| Role | Attribute selector | Key data attributes |
+|------|-------------------|---------------------|
+| container | `[data-gantt-role="container"]` | — |
+| task bar | `[data-gantt-role="task-bar"]` | `data-gantt-task-id`, `data-gantt-x/y/w/h`, `data-gantt-start/end`, `data-gantt-critical`, `data-gantt-category`, `data-gantt-status`, `data-gantt-lane` |
+| milestone | `[data-gantt-role="milestone"]` | `data-gantt-task-id`, coords, `data-gantt-start` |
+| summary | `[data-gantt-role="summary"]` | `data-gantt-task-id`, coords, `data-gantt-start/end` |
+| scale cell | `[data-gantt-role="scale-cell"]` | `data-gantt-scale-row`, `data-gantt-unit`, `data-gantt-date`, `data-gantt-w`, `data-gantt-weekend/holiday/today` |
+| link | `[data-gantt-role="link"]` | `data-gantt-link-id`, `data-gantt-link-source/target/type`, `data-gantt-points` |
+| marker | `[data-gantt-role="marker"]` | `data-gantt-marker-id`, `data-gantt-date`, `data-gantt-x` |
+| now-line | `[data-gantt-role="now-line"]` | `data-gantt-date`, `data-gantt-x` |
+
+### Ref handle — `GanttHandle`
+
+```tsx
+import { useRef } from 'react';
+import { Gantt, type GanttHandle } from '@bluemillstudio/gantt';
+
+const handle = useRef<GanttHandle>(null);
+
+<Gantt ref={handle} tasks={tasks} />;
+
+// Serializable layout — great for agent ingestion / visual regression
+const snap = handle.current!.snapshot();
+// { bars: [...], scaleRows: [...], links: [...], totalWidth, ... }
+
+// Hit-testing (content-coordinate space)
+handle.current!.elementAt(420, 58);   // { kind: 'bar', ref: LayoutBar }
+handle.current!.rowAtY(58);            // LayoutBar | null
+handle.current!.dateAtX(420);          // ISO string
+handle.current!.cellAtX(420);          // LayoutScaleCell | null
+
+// DOM helpers
+handle.current!.taskBarRect('t-123');  // DOMRect in viewport coordinates
+
+// Alignment sanity check
+const report = handle.current!.validate();
+if (!report.ok) console.warn(report.issues);
+```
+
+### Pure hit-test helpers (no DOM)
+
+```ts
+import { rowAtY, cellAtX, barAtPoint, dateAtX } from '@bluemillstudio/gantt/store';
+```
+
+These operate on plain layout data, so they're usable in SSR, workers, Node-based tests, and anywhere a store snapshot is available.
+
 ## Headless Mode
 
 Use the store directly without the UI component — useful for server-side calculations or custom renderers:

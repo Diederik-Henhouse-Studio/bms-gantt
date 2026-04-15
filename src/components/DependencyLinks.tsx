@@ -142,8 +142,17 @@ export function DependencyLinks() {
             : 'url(#arrowhead)';
 
         return (
-          <g key={link.id}>
-            {/* Invisible wider hit area so thin links stay easy to click */}
+          <g
+            key={link.id}
+            data-gantt-role="link"
+            data-gantt-link-id={link.id}
+            data-gantt-link-source={link.source}
+            data-gantt-link-target={link.target}
+            data-gantt-link-type={link.type}
+            data-gantt-critical={isCritical ? 'true' : undefined}
+            data-gantt-selected={isSelected ? 'true' : undefined}
+            data-gantt-points={link.$points}
+          >
             <polyline
               points={link.$points}
               fill="none"
