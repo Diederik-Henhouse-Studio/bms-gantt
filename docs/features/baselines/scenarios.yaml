@@ -1,0 +1,47 @@
+- id: baseline-renders-when-enabled
+  purpose: "Positioning sets $bx/$bw on tasks with baselines when showBaselines is on."
+  tags: [happy-path, unit]
+  setup:
+    fixtures:
+      task_a:
+        id: a
+        text: A
+        start: "2026-05-10T00:00:00.000Z"
+        end: "2026-05-20T00:00:00.000Z"
+        baseStart: "2026-05-01T00:00:00.000Z"
+        baseEnd: "2026-05-15T00:00:00.000Z"
+        duration: 10
+        progress: 0
+        parentId: null
+        type: task
+        open: false
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: positionBaselines
+    args:
+      - [{ ref: task_a }]
+      - { start: "2026-05-01T00:00:00.000Z", end: "2026-05-30T00:00:00.000Z" }
+      - 900
+      - { showBaselines: true, cellHeight: 36, barHeight: 24 }
+  then:
+    - probe: return[0].$bx
+      type: number
+    - probe: return[0].$bw
+      type: number
+
+- id: missing-baseline-renders-nothing
+  purpose: "Tasks without baseStart/baseEnd produce no baseline element."
+  tags: [edge, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+    config:
+      showBaselines: true
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '[data-gantt-role="task-bar"] > div[aria-hidden="true"]'
+      eq: 0

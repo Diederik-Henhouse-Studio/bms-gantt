@@ -1,0 +1,41 @@
+id: scheduling
+kind: behavior
+applies_to: store + config flags
+
+exports:
+  - kind: function
+    name: calcCriticalPath
+    path: "@bluemillstudio/gantt/store"
+    signature: "(tasks: GanttTask[], links: GanttLink[]) => { taskIds: Set<string>; linkIds: Set<string> }"
+  - kind: function
+    name: calcSlack
+    path: "@bluemillstudio/gantt/store"
+    signature: "(tasks: GanttTask[], links: GanttLink[]) => Map<string, number>"
+  - kind: function
+    name: autoSchedule
+    path: "@bluemillstudio/gantt/store"
+    signature: "(tasks: GanttTask[], links: GanttLink[], calendar: GanttCalendar) => GanttTask[]"
+  - kind: function
+    name: topologicalSort
+    path: "@bluemillstudio/gantt/store"
+    signature: "(tasks: GanttTask[], links: GanttLink[]) => GanttTask[]"
+  - kind: function
+    name: detectCycles
+    path: "@bluemillstudio/gantt/store"
+    signature: "(tasks: GanttTask[], links: GanttLink[]) => string[]"
+
+invariants:
+  - when: "config.showCriticalPath is true"
+    guarantee: "Tasks on the critical path expose data-gantt-critical=\"true\"."
+  - when: "config.showSlack is true"
+    guarantee: "Every non-critical task has a finite task.slack value."
+  - when: "detectCycles returns a non-empty array"
+    guarantee: "autoSchedule refuses to run (or produces a deterministic best-effort) — consumer must break the cycle first."
+  - when: "autoSchedule runs over an e2s link a→b"
+    guarantee: "task b's start ≥ task a's end (measured in working days)."
+
+depends_on:
+  - calendar
+  - state-management
+
+breaking_changes: []

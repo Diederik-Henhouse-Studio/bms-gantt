@@ -1,0 +1,24 @@
+id: zoom
+kind: behavior
+applies_to: store state + toolbar
+
+exports:
+  - kind: type
+    name: ZoomLevel
+    path: "@bluemillstudio/gantt"
+    enum: [minutes, hours, days, weeks, months, quarters, years]
+  - kind: value
+    name: ZOOM_PRESETS
+    path: "@bluemillstudio/gantt/store"
+    description: "Record<ZoomLevel, { scales, cellWidth }>. Authoritative source."
+
+invariants:
+  - when: "setZoom(level) is called with a known level"
+    guarantee: "scales and cellWidth are replaced with the preset's values; totalWidth changes accordingly."
+  - when: "setZoom receives an unknown level"
+    guarantee: "State is unchanged; a console.warn is emitted."
+  - when: "zoomLevel is 'minutes'"
+    guarantee: "The finest scale row has unit 'minute' with step 15."
+
+depends_on: []
+breaking_changes: []

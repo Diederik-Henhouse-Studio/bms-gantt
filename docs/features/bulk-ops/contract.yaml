@@ -1,0 +1,30 @@
+id: bulk-ops
+kind: behavior
+applies_to: store + keyboard + context menu
+
+exports:
+  - kind: function
+    name: removeTasks
+    path: "store action — useGanttStore.getState().removeTasks"
+    signature: "(ids: string[]) => void"
+  - kind: function
+    name: shiftTasks
+    path: "store action — useGanttStore.getState().shiftTasks"
+    signature: "(ids: string[], deltaDays: number) => void"
+
+invariants:
+  - when: "removeTasks([]) is called"
+    guarantee: "Store is unchanged."
+  - when: "removeTasks(['a','b']) where a,b have descendants"
+    guarantee: "a, b, and all descendants are removed; orphaned links removed; one undo entry produced."
+  - when: "shiftTasks(ids, 5) where task t in ids has lockStart: true"
+    guarantee: "t.start and t.end are unchanged; other tasks shift by 5 days."
+  - when: "Delete key pressed with selectedTaskIds.length > 0 and focus outside an input"
+    guarantee: "removeTasks(selectedTaskIds) is called."
+
+depends_on:
+  - state-management
+  - undo-redo
+  - drag-constraints
+
+breaking_changes: []

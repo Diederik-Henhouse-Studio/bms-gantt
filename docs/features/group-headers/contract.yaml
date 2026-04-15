@@ -1,0 +1,19 @@
+id: group-headers
+kind: component
+applies_to: rendered DOM in rowMode=multi
+
+exports:
+  - kind: component
+    name: GroupHeaders
+    path: "@bluemillstudio/gantt"
+    description: "Renders group label banners in multi-row mode. Mounted automatically inside TaskBars."
+
+invariants:
+  - when: "config.rowMode === 'single'"
+    guarantee: "No group-header elements are rendered."
+  - when: "config.rowMode === 'multi' AND taskGroups.length > 0"
+    guarantee: "One header element per group; each shows group.label plus the task count."
+
+depends_on:
+  - state-management
+breaking_changes: []

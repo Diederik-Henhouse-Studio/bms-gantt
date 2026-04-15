@@ -1,0 +1,62 @@
+- id: critical-path-marks-longest-chain
+  purpose: "A chain a→b→c with durations 3,5,2 puts a, b, c on the critical path."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-04T00:00:00.000Z",
+          duration: 3, progress: 0, parentId: null, type: task, open: false }
+      - { id: b, text: B, start: "2026-05-04T00:00:00.000Z", end: "2026-05-09T00:00:00.000Z",
+          duration: 5, progress: 0, parentId: null, type: task, open: false }
+      - { id: c, text: C, start: "2026-05-09T00:00:00.000Z", end: "2026-05-11T00:00:00.000Z",
+          duration: 2, progress: 0, parentId: null, type: task, open: false }
+    links:
+      - { id: l1, source: a, target: b, type: e2s }
+      - { id: l2, source: b, target: c, type: e2s }
+    config:
+      showCriticalPath: true
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '[data-gantt-role="task-bar"][data-gantt-critical="true"]'
+      eq: 3
+
+- id: slack-is-zero-on-critical
+  purpose: "Tasks on the critical path have slack === 0."
+  tags: [happy-path, handle]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-04T00:00:00.000Z",
+          duration: 3, progress: 0, parentId: null, type: task, open: false }
+      - { id: b, text: B, start: "2026-05-04T00:00:00.000Z", end: "2026-05-09T00:00:00.000Z",
+          duration: 5, progress: 0, parentId: null, type: task, open: false }
+    links:
+      - { id: l1, source: a, target: b, type: e2s }
+    config:
+      showCriticalPath: true
+      showSlack: true
+  when:
+    kind: handle-method
+    method: snapshot
+  then:
+    - probe: return.bars
+      all: { critical: true }
+
+- id: detectcycles-finds-simple-loop
+  purpose: "A→B→A loop is reported."
+  tags: [edge, unit]
+  setup:
+    fixtures:
+      task_a: { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+      task_b: { id: b, text: B, start: "2026-05-02T00:00:00.000Z", end: "2026-05-03T00:00:00.000Z" }
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/store"
+    fn: detectCycles
+    args:
+      - [{ ref: task_a }, { ref: task_b }]
+      - [ { id: l1, source: a, target: b, type: e2s },
+          { id: l2, source: b, target: a, type: e2s } ]
+  then:
+    - probe: return.length
+      gte: 1

@@ -1,0 +1,24 @@
+id: slots
+kind: prop-slot
+applies_to: Gantt props (slots)
+
+exports:
+  - kind: type
+    name: GanttSlots
+    path: "@bluemillstudio/gantt"
+    fields:
+      - { name: renderTaskBar,     type: "(task: GanttTask) => ReactNode", description: "Inner content of a regular task bar." }
+      - { name: renderTaskTooltip, type: "(task: GanttTask) => ReactNode", description: "Hover tooltip body. Return null/undefined to fall back to the default." }
+      - { name: renderHeaderCell,  type: "(cell: ScaleCell, rowIndex: number) => ReactNode", description: "Content of a timeline header cell." }
+      - { name: columns,           type: "ColumnDef<GanttTask, any>[]", description: "Replaces the entire left-pane column set." }
+
+invariants:
+  - when: "slots is omitted"
+    guarantee: "Chart renders with built-in defaults for every slot."
+  - when: "slots.renderTaskBar returns a node"
+    guarantee: "It is rendered inside the bar wrapper; drag handlers and data attributes on the wrapper stay intact."
+  - when: "slots.columns is provided"
+    guarantee: "The left-pane grid uses exactly those columns; TanStack Table features (resize, sort) remain available."
+
+depends_on: []
+breaking_changes: []

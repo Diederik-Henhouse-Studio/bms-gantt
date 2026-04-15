@@ -1,0 +1,38 @@
+id: computation
+kind: prop-slot
+applies_to: Gantt props + GanttTask output
+
+exports:
+  - kind: type
+    name: ComputedField
+    path: "@bluemillstudio/gantt"
+    fields:
+      - { name: key,     type: string }
+      - { name: compute, type: "(task: GanttTask, all: GanttTask[]) => unknown" }
+  - kind: type
+    name: SummaryAggregator
+    path: "@bluemillstudio/gantt"
+    signature: "(children: GanttTask[]) => unknown"
+  - kind: function
+    name: applyComputedFields
+    path: "@bluemillstudio/gantt/store"
+    signature: "(tasks: GanttTask[], fields?: ComputedField[]) => GanttTask[]"
+  - kind: function
+    name: applySummaryAggregators
+    path: "@bluemillstudio/gantt/store"
+    signature: "(tasks: GanttTask[], aggregators?: Record<string, SummaryAggregator>) => GanttTask[]"
+
+invariants:
+  - when: "computedFields contains { key: 'x', compute }"
+    guarantee: "After recalculate, every task has task.$computed.x populated (or undefined on failure)."
+  - when: "a compute throws"
+    guarantee: "No exception leaks; the key's value is undefined; a console.warn is emitted; other fields still run."
+  - when: "summaryAggregators is set and a summary task has children"
+    guarantee: "Each aggregator runs exactly once per summary; result on summary.$computed[key]."
+  - when: "summaryAggregators runs"
+    guarantee: "It sees children that already contain their $computed (field pipeline ran first)."
+
+depends_on:
+  - state-management
+
+breaking_changes: []

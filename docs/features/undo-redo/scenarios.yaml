@@ -1,0 +1,37 @@
+- id: undo-restores-removed-task
+  purpose: "Undo after removeTask puts the task back."
+  tags: [happy-path, interaction]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+  when:
+    kind: sequence
+    steps:
+      - { kind: handle-method, method: removeTasks, args: [["a"]] }
+      - { kind: handle-method, method: undo }
+  then:
+    - probe: handle.snapshot.bars.length
+      eq: 1
+    - probe: handle.snapshot.bars[0].taskId
+      eq: "a"
+
+- id: bulk-delete-is-single-undo-step
+  purpose: "Removing N tasks at once requires only one undo to restore."
+  tags: [happy-path, interaction]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z",
+          duration: 1, progress: 0, parentId: null, type: task, open: false }
+      - { id: b, text: B, start: "2026-05-03T00:00:00.000Z", end: "2026-05-04T00:00:00.000Z",
+          duration: 1, progress: 0, parentId: null, type: task, open: false }
+      - { id: c, text: C, start: "2026-05-05T00:00:00.000Z", end: "2026-05-06T00:00:00.000Z",
+          duration: 1, progress: 0, parentId: null, type: task, open: false }
+  when:
+    kind: sequence
+    steps:
+      - { kind: handle-method, method: removeTasks, args: [["a","b","c"]] }
+      - { kind: handle-method, method: undo }
+  then:
+    - probe: handle.snapshot.bars.length
+      eq: 3

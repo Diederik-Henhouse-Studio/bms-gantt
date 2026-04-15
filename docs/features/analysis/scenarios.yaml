@@ -1,0 +1,59 @@
+- id: forecast-doubles-time-at-half-progress
+  purpose: "At half progress after the planned midpoint, forecast stretches proportionally."
+  tags: [happy-path, unit]
+  setup:
+    fixtures:
+      task_a:
+        id: a
+        text: A
+        progress: 25
+        start: "2026-05-01T00:00:00.000Z"
+        end: "2026-05-11T00:00:00.000Z"
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/analysis"
+    fn: forecastEnd
+    args:
+      - { ref: task_a }
+      - "2026-05-06T00:00:00.000Z"
+  then:
+    - probe: return
+      eq: "2026-05-21T00:00:00.000Z"
+
+- id: resourceload-counts-tasks-active-per-day
+  purpose: "resourceLoad sums tasks whose interval covers each day."
+  tags: [happy-path, unit]
+  setup:
+    fixtures:
+      ta: { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-03T00:00:00.000Z" }
+      tb: { id: b, text: B, start: "2026-05-02T00:00:00.000Z", end: "2026-05-02T00:00:00.000Z" }
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/analysis"
+    fn: resourceLoad
+    args:
+      - [{ ref: ta }, { ref: tb }]
+  then:
+    - probe: return.length
+      eq: 3
+    - probe: return[1].count
+      eq: 2
+
+- id: burndown-starts-at-total-ends-at-zero
+  purpose: "Ideal line begins at total duration and reaches zero at the end."
+  tags: [happy-path, unit]
+  setup:
+    fixtures:
+      ta: { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+        duration: 5, progress: 0 }
+  when:
+    kind: unit-call
+    module: "@bluemillstudio/gantt/analysis"
+    fn: burndown
+    args:
+      - [{ ref: ta }]
+  then:
+    - probe: return[0].ideal
+      approx: 5
+    - probe: return[-1].ideal
+      approx: 0
