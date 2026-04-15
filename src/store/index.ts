@@ -16,9 +16,12 @@ export type {
   ZoomConfig,
   TaskType,
   TaskCategory,
+  TaskStatus,
   LinkType,
   ScaleUnit,
   LaneGroup,
+  ComputedField,
+  SummaryAggregator,
 } from './types';
 
 // Store

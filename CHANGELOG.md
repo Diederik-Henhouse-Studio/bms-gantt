@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-04-15
+
+### Added — Computation layer
+The library now lets consumers drive derived values and data transforms without owning the data layer (fetch/cache stay your responsibility).
+
+- **`computedFields` prop on `<Gantt>`** — pipeline of `{ key, compute(task, all) }` runs during recalculate; results land on `task.$computed[key]`. Consumable from `slots.renderTaskBar`, custom columns, tooltip content, etc.
+- **`summaryAggregators` prop** — `Record<string, (children) => unknown>`; aggregate values roll up onto each summary task under `$computed[key]`. Runs AFTER `computedFields` so aggregators can read computed child values.
+- **`@bluemillstudio/gantt/query`** sub-export — pure `filterTasks`, `sortTasks`, `groupTasksBy` for data pipelines. No React, no store.
+- **`@bluemillstudio/gantt/analysis`** sub-export — `forecastEnd` (linear ETA), `resourceLoad` (per-day histogram with optional weight + breakdown), `burndown` (ideal-vs-actual curve).
+
+### Scope boundary
+The library intentionally does **not** handle fetch, cache invalidation, persistence, or server state. Bring your own TanStack Query / SWR / Apollo — this layer plugs downstream of whatever you use.
+
+### Example
+```tsx
+<Gantt
+  tasks={tasks}
+  computedFields={[
+    { key: 'riskScore', compute: (t) => (t.slack ?? Infinity) < 2 ? 'high' : 'low' },
+    { key: 'cost',      compute: (t) => (t.hourlyRate ?? 0) * t.duration * 8 },
+  ]}
+  summaryAggregators={{
+    totalCost: (children) => children.reduce((s, c) => s + Number(c.$computed?.cost ?? 0), 0),
+  }}
+  slots={{
+    columns: [
+      helper.accessor('text', { header: 'Task' }),
+      helper.accessor((t) => t.$computed?.riskScore, { header: 'Risk' }),
+      helper.accessor((t) => t.$computed?.cost, { header: 'Cost' }),
+    ],
+  }}
+/>
+```
+
+### Tests: 183 → 207 (+24 across computation, query, analysis).
+
 ## [0.7.0] - 2026-04-15
 
 ### Added — Introspection layer

@@ -52,6 +52,7 @@ import {
   applyResizeStartConstraints,
   applyResizeEndConstraints,
 } from './dragConstraints';
+import { applyComputedFields, applySummaryAggregators } from './computation';
 
 // ── Default config ────────────────────────────────────────────
 
@@ -176,6 +177,19 @@ const ganttStateCreator: StateCreator<GanttState> = (set, get) => {
       }));
     }
 
+    // 12. Consumer-defined derived fields + summary aggregators (v0.8).
+    // Run AFTER core positioning/scheduling so computers can read critical/slack.
+    if (state.computedFields && state.computedFields.length > 0) {
+      positioned = positioned.map((t) => ({
+        ...t,
+        $computed: t.$computed ? { ...t.$computed } : {},
+      }));
+      applyComputedFields(positioned, state.computedFields);
+    }
+    if (state.summaryAggregators) {
+      applySummaryAggregators(positioned, state.summaryAggregators);
+    }
+
     // K2: links (brondata) wordt NIET overschreven — alleen flatTasks en visibleLinks
     set({
       tasks: summarised,
@@ -209,6 +223,10 @@ const ganttStateCreator: StateCreator<GanttState> = (set, get) => {
     totalHeight: 0,
     visibleLinks: [],
     taskGroups: [],
+
+    // ── Consumer-defined compute pipelines (v0.8) ──────────
+    computedFields: undefined,
+    summaryAggregators: undefined,
 
     // ── UI state ────────────────────────────────────────────
     selectedTaskIds: [],

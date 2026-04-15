@@ -11,7 +11,7 @@ import { cn } from '../utils/cn';
 import { validateGanttInput } from '../utils/validateTasks';
 
 import { useGanttStore, rowAtY as rowAtYFn, cellAtX as cellAtXFn, barAtPoint, dateAtX as dateAtXFn } from '../store';
-import type { GanttTask, GanttLink, GanttMarker, GanttConfig } from '../store';
+import type { GanttTask, GanttLink, GanttMarker, GanttConfig, ComputedField, SummaryAggregator } from '../store';
 import { GanttLayout } from './GanttLayout';
 import { GanttErrorBoundary } from './GanttErrorBoundary';
 import { LabelsProvider, type GanttLabels } from '../i18n';
@@ -37,6 +37,14 @@ export interface GanttProps {
   labels?: Partial<GanttLabels>;
   /** Customisation slots: custom task bar renderer, custom left-pane columns. */
   slots?: GanttSlots;
+  /**
+   * Consumer-defined derived fields. Run during recalculate; results land
+   * on `task.$computed[key]` and can be read by columns, renderTaskBar,
+   * tooltip, etc.
+   */
+  computedFields?: ComputedField[];
+  /** Summary aggregators applied to summary tasks after computedFields. */
+  summaryAggregators?: Record<string, SummaryAggregator>;
 
   // Event callbacks
   onTaskClick?: (task: GanttTask) => void;
@@ -57,6 +65,8 @@ export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt({
   className,
   labels,
   slots,
+  computedFields,
+  summaryAggregators,
   onTaskClick,
   onTaskDoubleClick,
   onTaskUpdate,
@@ -298,6 +308,8 @@ export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt({
       tasks,
       links,
       markers,
+      computedFields,
+      summaryAggregators,
     };
 
     if (config) {
@@ -315,7 +327,7 @@ export const Gantt = forwardRef<GanttHandle, GanttProps>(function Gantt({
     }
 
     initialised.current = true;
-  }, [tasks, links, markers, config]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [tasks, links, markers, config, computedFields, summaryAggregators]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // H1: cleanup dragState on unmount to prevent stale state
   useEffect(() => {
