@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-04-15
+
+### Added
+- **Multi-row group header labels** — in `rowMode: 'multi'` each group now shows its label and task count above the group's lane block. New `GroupHeaders` component exposed publicly.
+
 ## [0.5.1] - 2026-04-15
 
 ### Added

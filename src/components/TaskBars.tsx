@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useGanttStore } from '../store';
 import type { GanttTask, DragState } from '../store';
 import { TaskBar } from './TaskBar';
+import { GroupHeaders } from './GroupHeaders';
 
 // ── Props ──────────────────────────────────────────────────────
 
@@ -185,6 +186,8 @@ export function TaskBars({ readonly, onTaskClick, onTaskDoubleClick }: TaskBarsP
       className="relative"
       style={{ width: totalWidth, height: totalHeight }}
     >
+      <GroupHeaders />
+
       {visibleTasks.map((task) => (
         <TaskBar
           key={task.id}

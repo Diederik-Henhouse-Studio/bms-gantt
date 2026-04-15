@@ -19,3 +19,4 @@ export { Markers } from './Markers';
 export { TaskEditor } from './TaskEditor';
 export { GanttContextMenu } from './GanttContextMenu';
 export { LinkCreator } from './LinkCreator';
+export { GroupHeaders } from './GroupHeaders';
