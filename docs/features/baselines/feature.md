@@ -2,7 +2,7 @@
 id: baselines
 title: Baseline (plan-vs-actual) bars
 status: stable
-since: 0.1.0 (rendered behind in 0.5.0)
+since: 0.1.0
 category: presentation
 owners:
   - src/store/positioning.ts

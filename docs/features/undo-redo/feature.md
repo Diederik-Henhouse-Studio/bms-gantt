@@ -2,7 +2,7 @@
 id: undo-redo
 title: Undo / redo (temporal middleware)
 status: stable
-since: 0.1.0 (exposed via toolbar + keyboard in 0.2.0)
+since: 0.1.0
 category: interaction
 owners:
   - src/store/ganttStore.ts
