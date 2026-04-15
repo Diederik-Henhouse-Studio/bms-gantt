@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-04-15
+
+### Added
+- **`config.showToolbar: boolean`** (default `true`) — opt out of the built-in toolbar to use your own. `GanttToolbar` is now exported from the package root so you can reuse it.
+- **`slots.renderTaskTooltip`** — custom tooltip content on hover. A default tooltip (name, dates, duration, progress, slack) renders when the slot is omitted.
+
+### Changed
+- **Default grid width 300 → 420 px, min 200 → 220 px** — the Duration column is no longer clipped behind the timeline (audit #25).
+- Tooltip is now a React component instead of the native `title` attribute — richer formatting, works across browsers.
+
+### Closed issues
+- #24 (showToolbar), #25 (column clip), #26 (status styling, delivered in 0.5.0), #27 (tooltip slot).
+
+### Deferred
+- #28 multi-row group headers — moved to a standalone PR due to layout complexity.
+
 ## [0.5.0] - 2026-04-15
 
 ### Fixed (audit sprint 1)

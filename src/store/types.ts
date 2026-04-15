@@ -308,6 +308,8 @@ export interface GanttConfig {
   showCriticalPath: boolean;
   /** Show slack/float indicators on non-critical tasks. */
   showSlack: boolean;
+  /** Show the built-in toolbar (zoom, today, critical path, etc.). Default: true. */
+  showToolbar: boolean;
 
   // ── Calendar ──────────────────────────────────────────────
   /**

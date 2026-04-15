@@ -3,10 +3,23 @@
 // Renders a single task bar (regular, milestone, or summary).
 // ─────────────────────────────────────────────────────────────
 
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '../utils/cn';
 import type { GanttTask, TaskCategory } from '../store';
 import { useSlots } from '../slots';
+
+function DefaultTooltip({ task }: { task: GanttTask }) {
+  const fmt = (d: Date) => d.toLocaleDateString();
+  return (
+    <div className="space-y-0.5">
+      <div className="font-medium">{task.text}</div>
+      <div className="text-[10px] opacity-80">
+        {fmt(task.start)} → {fmt(task.end)} · {task.duration}d · {Math.round(task.progress)}%
+        {task.slack != null ? ` · slack ${task.slack}d` : ''}
+      </div>
+    </div>
+  );
+}
 
 // ── Props ──────────────────────────────────────────────────────
 
@@ -156,9 +169,14 @@ function SummaryBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
 function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDragStart }: TaskBarProps) {
   const colors = getCategoryColors(task);
   const progressPct = Math.max(0, Math.min(100, task.progress));
-  const { renderTaskBar } = useSlots();
+  const { renderTaskBar, renderTaskTooltip } = useSlots();
   const customContent = renderTaskBar?.(task);
   const isCritical = !!task.critical;
+  const [hovered, setHovered] = useState(false);
+
+  const tooltipContent = renderTaskTooltip
+    ? renderTaskTooltip(task)
+    : <DefaultTooltip task={task} />;
 
   // Task status affects opacity / decoration.
   const statusStyle: React.CSSProperties = {};
@@ -192,9 +210,8 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
           : {}),
         ...statusStyle,
       }}
-      title={`${task.text}\n${task.start.toLocaleDateString()} → ${task.end.toLocaleDateString()}${
-        task.slack != null ? ` · slack ${task.slack}d` : ''
-      }`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       onClick={(e) => onSelect(task.id, e)}
       onDoubleClick={() => onDoubleClick(task.id)}
       onMouseDown={!readonly ? (e) => {
@@ -265,6 +282,16 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
             }}
           />
         </>
+      )}
+
+      {/* Hover tooltip */}
+      {hovered && tooltipContent != null && (
+        <div
+          className="absolute z-50 px-2 py-1 rounded bg-popover text-popover-foreground text-xs border shadow-lg pointer-events-none whitespace-nowrap"
+          style={{ left: 0, top: -4, transform: 'translateY(-100%)' }}
+        >
+          {tooltipContent}
+        </div>
       )}
     </div>
   );
