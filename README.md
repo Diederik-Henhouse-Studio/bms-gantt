@@ -589,6 +589,19 @@ src/
 
 For a deeper architectural tour, see [docs/architectuur.md](docs/architectuur.md).
 
+## Example app
+
+A live demo lives in [`example/`](example/). It consumes the library via `file:..`, so you can iterate end-to-end:
+
+```bash
+npm run build         # build the library
+cd example
+npm install
+npm run dev           # http://localhost:5173
+```
+
+The app demonstrates slots, theming (dark-mode toggle), introspection (the "📸 Snapshot" button dumps `handle.snapshot()`), and computed fields.
+
 ## Development
 
 ```bash
