@@ -66,3 +66,7 @@ The runner and probe implementation are a work-in-progress — see the `tests/RE
 - **Scenarios focus on outcomes, not DOM internals.** Probe via `data-gantt-*` attributes or `handle.snapshot()` — never by CSS class name.
 - **Every `then.expect` must be a literal value or a regex**, never a computed expression; keep scenarios declarative so an agent can diff them.
 - **Keep `examples/*.tsx` compilable** as plain TypeScript with the package installed; no app-specific imports. CI enforces this: `npm run typecheck:examples` must pass.
+
+## Coverage gate
+
+CI fails if any public export of the library is missing from every `contract.yaml`. The list of intentional omissions lives in [`scripts/check-contract-coverage.mjs`](../../scripts/check-contract-coverage.mjs) with per-group justifications. Adding a new export therefore forces either a documentation update or an explicit waiver decision.
