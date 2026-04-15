@@ -364,6 +364,31 @@ const dutch: Partial<GanttLabels> = {
 
 See `DEFAULT_LABELS` exported from the package for the full list of keys.
 
+## Theming via CSS custom properties
+
+Key colours can be overridden via CSS variables. No stylesheet import is required — all values fall back to sensible defaults if the variable is not set. Scope overrides to the `.gantt-container` class to isolate them from the rest of your app.
+
+```css
+.gantt-container {
+  --gantt-weekend-bg: rgb(148 163 184 / 0.12);
+  --gantt-holiday-bg: rgb(239 68 68 / 0.1);
+  --gantt-today-color: hsl(220 90% 55%);
+  --gantt-today-fg: white;
+  --gantt-critical-color: rgb(239 68 68);
+  --gantt-baseline-bg: rgb(148 163 184 / 0.15);
+  --gantt-baseline-stripe: rgb(148 163 184 / 0.35);
+  --gantt-baseline-border: rgb(148 163 184 / 0.6);
+}
+
+/* Dark-mode tweak */
+.dark .gantt-container {
+  --gantt-weekend-bg: rgb(148 163 184 / 0.08);
+  --gantt-critical-color: rgb(252 165 165);
+}
+```
+
+Bar category colours, status opacity, and text contrast are still driven by Tailwind + shadcn variables — consumer controls those via their existing design tokens.
+
 ## Styling & Theming
 
 The component uses **Tailwind CSS** utility classes and expects the following shadcn/ui CSS variables:

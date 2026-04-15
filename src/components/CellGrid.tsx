@@ -135,8 +135,7 @@ export const CellGrid: React.FC<CellGridProps> = memo(
             y={0}
             width={r.width}
             height={totalHeight}
-            fill="rgb(148 163 184)"
-            fillOpacity={0.12}
+            fill="var(--gantt-weekend-bg, rgb(148 163 184 / 0.12))"
           />
         ))}
 
@@ -148,8 +147,7 @@ export const CellGrid: React.FC<CellGridProps> = memo(
             y={0}
             width={r.width}
             height={totalHeight}
-            fill="rgb(239 68 68)"
-            fillOpacity={0.1}
+            fill="var(--gantt-holiday-bg, rgb(239 68 68 / 0.1))"
           />
         ))}
 
@@ -217,7 +215,7 @@ export const CellGrid: React.FC<CellGridProps> = memo(
             y1={0}
             x2={todayLine.x}
             y2={totalHeight}
-            stroke="currentColor"
+            stroke="var(--gantt-today-color, currentColor)"
             className="text-primary"
             strokeWidth={2}
             strokeDasharray="4 4"

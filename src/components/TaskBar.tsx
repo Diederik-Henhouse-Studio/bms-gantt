@@ -206,7 +206,10 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         ...(colors.custom ? { backgroundColor: colors.custom } : {}),
         cursor: readonly ? 'default' : 'grab',
         ...(isCritical && !isSelected
-          ? { boxShadow: '0 0 0 2px rgb(239 68 68), 0 0 6px rgba(239,68,68,0.4)' }
+          ? {
+              boxShadow:
+                '0 0 0 2px var(--gantt-critical-color, rgb(239 68 68)), 0 0 6px color-mix(in srgb, var(--gantt-critical-color, rgb(239 68 68)) 40%, transparent)',
+            }
           : {}),
         ...statusStyle,
       }}
@@ -319,8 +322,8 @@ function BaselineBar({ task }: { task: GanttTask }) {
         height: task.$h,
         zIndex: 0,
         background:
-          'repeating-linear-gradient(45deg, rgb(148 163 184 / 0.35) 0 6px, rgb(148 163 184 / 0.15) 6px 12px)',
-        border: '1px dashed rgb(148 163 184 / 0.6)',
+          'repeating-linear-gradient(45deg, var(--gantt-baseline-stripe, rgb(148 163 184 / 0.35)) 0 6px, var(--gantt-baseline-bg, rgb(148 163 184 / 0.15)) 6px 12px)',
+        border: '1px dashed var(--gantt-baseline-border, rgb(148 163 184 / 0.6))',
       }}
       aria-hidden="true"
     />

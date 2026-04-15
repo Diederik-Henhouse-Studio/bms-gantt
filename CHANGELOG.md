@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-15
+
+### Added
+- **CSS custom properties for theming** — consumers can override key colours via CSS without importing any stylesheet from the package. All values have sensible inline fallbacks so existing integrations keep working.
+
+Supported variables:
+
+| Variable | Purpose | Default |
+|----------|---------|---------|
+| `--gantt-weekend-bg` | Weekend column shading | `rgb(148 163 184 / 0.12)` |
+| `--gantt-holiday-bg` | Holiday column shading | `rgb(239 68 68 / 0.1)` |
+| `--gantt-today-color` | Today line + badge background | `hsl(var(--primary))` |
+| `--gantt-today-fg` | Today badge text colour | `hsl(var(--primary-foreground))` |
+| `--gantt-critical-color` | Critical-path ring colour | `rgb(239 68 68)` |
+| `--gantt-baseline-bg` | Baseline shadow bar background | `rgb(148 163 184 / 0.15)` |
+| `--gantt-baseline-stripe` | Baseline stripe colour | `rgb(148 163 184 / 0.35)` |
+| `--gantt-baseline-border` | Baseline dashed border | `rgb(148 163 184 / 0.6)` |
+
+### Dark-mode example
+\`\`\`css
+.dark .gantt-container {
+  --gantt-weekend-bg: rgb(148 163 184 / 0.08);
+  --gantt-holiday-bg: rgb(239 68 68 / 0.18);
+  --gantt-critical-color: rgb(252 165 165);
+}
+\`\`\`
+
 ## [0.5.2] - 2026-04-15
 
 ### Added
