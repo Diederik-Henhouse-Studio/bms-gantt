@@ -65,4 +65,4 @@ The runner and probe implementation are a work-in-progress — see the `tests/RE
 - **One feature = one folder.** If a change spans two features, write two `feature.md` files and cross-link them.
 - **Scenarios focus on outcomes, not DOM internals.** Probe via `data-gantt-*` attributes or `handle.snapshot()` — never by CSS class name.
 - **Every `then.expect` must be a literal value or a regex**, never a computed expression; keep scenarios declarative so an agent can diff them.
-- **Keep `examples/*.tsx` compilable** as plain TypeScript with the package installed; no app-specific imports.
+- **Keep `examples/*.tsx` compilable** as plain TypeScript with the package installed; no app-specific imports. CI enforces this: `npm run typecheck:examples` must pass.

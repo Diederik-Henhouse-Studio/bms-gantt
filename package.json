@@ -82,6 +82,7 @@
     "build": "tsup",
     "prepublishOnly": "npm run build",
     "typecheck": "tsc --noEmit",
+    "typecheck:examples": "tsc -p tsconfig.examples.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
