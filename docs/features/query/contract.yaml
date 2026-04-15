@@ -13,6 +13,12 @@ exports:
     name: groupTasksBy
     signature: "<K>(tasks: GanttTask[], keyOf: (t: GanttTask) => K) => Map<K, GanttTask[]>"
   - kind: type
+    name: SortKey
+    description: "Union type for sort keys (text | start | end | … | custom fn)."
+  - kind: type
+    name: SortSpec
+    description: "{ by: SortKey; dir?: 'asc' | 'desc' }"
+  - kind: type
     name: TaskFilter
     fields:
       - { name: text,        type: "string | undefined",                description: "Case-insensitive substring on text." }

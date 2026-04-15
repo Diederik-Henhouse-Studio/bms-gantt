@@ -33,6 +33,33 @@ exports:
     path: "@bluemillstudio/gantt/store"
     signature: "(x: number, dateRange: DateRange, totalWidth: number) => Date"
 
+  - kind: type
+    name: LayoutSnapshot
+    path: "@bluemillstudio/gantt"
+    description: "Serializable layout state returned by GanttHandle.snapshot()."
+  - kind: type
+    name: LayoutBar
+    path: "@bluemillstudio/gantt"
+    description: "One task bar inside a LayoutSnapshot."
+  - kind: type
+    name: LayoutScaleCell
+    path: "@bluemillstudio/gantt"
+    description: "One cell inside a scale row in a LayoutSnapshot."
+  - kind: type
+    name: LayoutLink
+    path: "@bluemillstudio/gantt"
+  - kind: type
+    name: LayoutMarker
+    path: "@bluemillstudio/gantt"
+  - kind: type
+    name: AlignmentReport
+    path: "@bluemillstudio/gantt"
+    description: "Return shape of handle.validate() — { ok, issues }."
+  - kind: type
+    name: AlignmentIssue
+    path: "@bluemillstudio/gantt"
+    description: "One issue reported by the alignment validator."
+
 # Every rendered element carries a data-gantt-role attribute.
 dom_contract:
   - role: container
