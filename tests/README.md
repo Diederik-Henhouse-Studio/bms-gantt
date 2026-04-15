@@ -1,47 +1,53 @@
-# Scenario runner (stub)
+# Scenario runner
 
-Each feature folder under `docs/features/*/` carries a `scenarios.yaml` whose entries are agent-executable. This directory will host the generic runner that enumerates them.
+Reads every `docs/features/*/scenarios.yaml` and drives the tests in [`features/features.test.ts`](features/features.test.ts).
 
-## Status: work-in-progress
+## Status
 
-Today the specs are the contract — humans and LLMs can already execute them manually or drive them through an MCP browser tool. A single-entry-point runner that covers every `when.kind` is not yet checked in.
+| `when.kind` | Implemented |
+|-------------|-------------|
+| `unit-call` | ✅ |
+| `handle-method` | ⏳ (next) |
+| `render` | ⏳ (next) |
+| `hover`, `keydown`, `drag-simulate`, `sequence` | ⏳ (later) |
 
-## Planned
+Scenarios whose `when.kind` is not yet supported register as `test.skip` so the gap stays visible.
 
+## Probe support
+
+| Probe prefix | Implemented |
+|--------------|-------------|
+| `return.*` / `return[n]` | ✅ |
+| `console.warnings` | ✅ |
+| `handle.snapshot.*` | ✅ (once render support lands) |
+| `handle.validate` | ✅ (once render support lands) |
+| `dom.count`, `dom.attribute`, `dom.text` | ✅ (once render support lands) |
+
+## Running
+
+```bash
+npm test                                # full suite — includes feature scenarios
+npx vitest run tests/features           # only scenarios
+DEBUG_SCENARIOS=1 npx vitest run ...    # verbose per-scenario logging
 ```
-tests/
-├── README.md                   (this file)
-├── runner/
-│   ├── parse.ts                — load + validate all scenarios.yaml
-│   ├── probes.ts               — dom, handle, return, console
-│   └── driver.playwright.ts    — Playwright-based executor
-└── features.spec.ts            — enumerates scenarios via Playwright's test.each
-```
 
-## Probe implementation sketch
+## Reference / interpolation inside scenarios.yaml
 
-| probe | implementation |
-|-------|---------------|
-| `dom.attribute { selector, attribute }` | `page.locator(selector).getAttribute(attribute)` |
-| `dom.count { selector }` | `page.locator(selector).count()` |
-| `handle.snapshot.<dot.path>` | `page.evaluate(() => window.__gantt.snapshot())` then dot-resolve (v0.7.1 debug hook required) |
-| `handle.validate` | `page.evaluate(() => window.__gantt.validate())` |
-| `return.<dot.path>` | invoke the `unit-call`'s module/fn, assert on the return value (runs in Node, not in the browser) |
-| `console.warnings` | attach listener before render, count after |
+- `{ ref: task_a }` → pulls the fixture from `setup.fixtures.task_a`
+- ISO strings like `"2026-05-01T00:00:00.000Z"` are converted to `Date`
+- `"__REL_DAYS__:-5"` → a `Date` that many days from now
+- Arrow-function strings like `"t => t.progress >= 100"` are `eval`'d
 
-## `when` kinds
+## Probes and comparators
 
-| kind | description |
-|------|-------------|
-| `render` | mount `<Gantt>` with setup data and stop |
-| `drag-simulate` | dispatch pointerdown/move/up on a selector to simulate a drag |
-| `unit-call` | import a module, invoke a pure function, capture return |
-| `handle-method` | after render, call a method on the `GanttHandle` ref |
+Each `then` entry is `{ probe: <name>, <comparator> }`. Comparators:
 
-## Open questions
-
-- Should the runner also emit a JSON summary consumable by CI dashboards?
-- Do we want property-based fuzzing over the `setup.tasks` arrays?
-- Visual regression: integrate Percy/Chromatic, or synthesize diffs from `snapshot()`?
-
-These decisions gate when we can close the "scenario runner" milestone.
+| Key | Semantics |
+|-----|-----------|
+| `eq` | `toStrictEqual` (Date coerced to ISO first) |
+| `gte`/`gt`/`lte`/`lt` | numeric comparison |
+| `match` | regex `toMatch` on `String(actual)` |
+| `type` | `typeof actual === value` |
+| `approx` | `toBeCloseTo(value, 1)` |
+| `contains_object` | array contains an object-matching |
+| `all` | every element matches object-matching |

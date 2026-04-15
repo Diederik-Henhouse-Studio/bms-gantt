@@ -90,3 +90,16 @@ export {
   barAtPoint,
   dateAtX,
 } from './hitTest';
+
+// Drag constraints (pure, no DOM)
+export {
+  applyMoveConstraints,
+  applyResizeStartConstraints,
+  applyResizeEndConstraints,
+} from './dragConstraints';
+
+// Computation layer (pure)
+export {
+  applyComputedFields,
+  applySummaryAggregators,
+} from './computation';
