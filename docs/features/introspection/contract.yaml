@@ -1,0 +1,91 @@
+id: introspection
+kind: behavior
+applies_to: "rendered DOM + <Gantt ref>"
+
+exports:
+  - kind: type
+    name: GanttHandle
+    path: "@bluemillstudio/gantt"
+    methods:
+      - { name: getElement,    signature: "() => HTMLDivElement | null" }
+      - { name: snapshot,      signature: "() => LayoutSnapshot" }
+      - { name: elementAt,     signature: "(x: number, y: number) => { kind, ref }" }
+      - { name: rowAtY,        signature: "(y: number) => LayoutBar | null" }
+      - { name: dateAtX,       signature: "(x: number) => string" }
+      - { name: cellAtX,       signature: "(x: number) => LayoutScaleCell | null" }
+      - { name: taskBarRect,   signature: "(taskId: string) => DOMRect | null" }
+      - { name: validate,      signature: "() => AlignmentReport" }
+
+  - kind: function
+    name: rowAtY
+    path: "@bluemillstudio/gantt/store"
+    signature: "(y: number, flatTasks: GanttTask[]) => GanttTask | null"
+  - kind: function
+    name: cellAtX
+    path: "@bluemillstudio/gantt/store"
+    signature: "(x: number, finestScaleRow: ScaleCell[]) => ScaleCell | null"
+  - kind: function
+    name: barAtPoint
+    path: "@bluemillstudio/gantt/store"
+    signature: "(x: number, y: number, flatTasks: GanttTask[]) => GanttTask | null"
+  - kind: function
+    name: dateAtX
+    path: "@bluemillstudio/gantt/store"
+    signature: "(x: number, dateRange: DateRange, totalWidth: number) => Date"
+
+# Every rendered element carries a data-gantt-role attribute.
+dom_contract:
+  - role: container
+    selector: '[data-gantt-role="container"]'
+    attributes: []
+  - role: task-bar
+    selector: '[data-gantt-role="task-bar"]'
+    attributes:
+      - data-gantt-task-id
+      - data-gantt-x
+      - data-gantt-y
+      - data-gantt-w
+      - data-gantt-h
+      - data-gantt-start          # ISO
+      - data-gantt-end            # ISO
+      - data-gantt-level
+      - data-gantt-type           # task | summary | milestone
+      - data-gantt-category       # optional
+      - data-gantt-status         # optional
+      - data-gantt-critical       # "true" when on critical path
+      - data-gantt-selected       # "true" when selected
+      - data-gantt-lane           # optional, multi-row mode
+      - data-gantt-group          # optional, multi-row mode
+  - role: milestone
+    selector: '[data-gantt-role="milestone"]'
+    attributes: [data-gantt-task-id, data-gantt-x, data-gantt-y, data-gantt-w, data-gantt-h, data-gantt-start, data-gantt-critical]
+  - role: summary
+    selector: '[data-gantt-role="summary"]'
+    attributes: [data-gantt-task-id, data-gantt-x, data-gantt-y, data-gantt-w, data-gantt-h, data-gantt-start, data-gantt-end]
+  - role: scale-cell
+    selector: '[data-gantt-role="scale-cell"]'
+    attributes: [data-gantt-scale-row, data-gantt-unit, data-gantt-date, data-gantt-w, data-gantt-weekend, data-gantt-holiday, data-gantt-today]
+  - role: link
+    selector: '[data-gantt-role="link"]'
+    attributes: [data-gantt-link-id, data-gantt-link-source, data-gantt-link-target, data-gantt-link-type, data-gantt-critical, data-gantt-selected, data-gantt-points]
+  - role: marker
+    selector: '[data-gantt-role="marker"]'
+    attributes: [data-gantt-marker-id, data-gantt-date, data-gantt-x]
+  - role: now-line
+    selector: '[data-gantt-role="now-line"]'
+    attributes: [data-gantt-date, data-gantt-x]
+
+invariants:
+  - when: "a task is rendered"
+    guarantee: "a [data-gantt-role=\"task-bar\" | \"milestone\" | \"summary\"][data-gantt-task-id=...] element exists in the DOM"
+  - when: "a link has a source and target both visible"
+    guarantee: "a [data-gantt-role=\"link\"][data-gantt-link-id=...] element exists"
+  - when: "handle.snapshot() is called"
+    guarantee: "returns a new plain object equal to JSON.parse(JSON.stringify(it))"
+
+depends_on: []
+
+breaking_changes:
+  - version: 0.7.0
+    change: "<Gantt ref> now yields GanttHandle, not HTMLDivElement"
+    migration: "call handle.getElement() to recover the container div"

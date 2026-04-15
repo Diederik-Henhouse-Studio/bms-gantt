@@ -1,0 +1,29 @@
+# Machine-readable API surface + invariants.
+# Keep in sync with the code. CI compares this against the typed exports.
+
+id: <feature-slug>
+kind: <prop-field | prop-slot | component | sub-export | behavior | type>
+applies_to: <surface this attaches to — e.g. GanttTask, Gantt props, @bluemillstudio/gantt/query>
+
+exports: []
+# Example entry:
+# - kind: type | function | component | value
+#   name: <exported symbol>
+#   path: "@bluemillstudio/gantt" | "@bluemillstudio/gantt/<subpath>"
+#   fields:          # for types
+#     - { name: foo, type: string | undefined, unit: days }
+#   signature: "(a: A, b: B) => R"   # for functions
+#   props:           # for components
+#     - { name: onChange, required: false, type: "(v: T) => void" }
+
+invariants: []
+# - when: <condition>
+#   guarantee: <always-true statement>
+
+depends_on: []
+# - <slug of another feature this relies on>
+
+breaking_changes: []
+# - version: 0.7.0
+#   change: "ref now yields GanttHandle, not HTMLDivElement"
+#   migration: "call handle.getElement() to recover the div"

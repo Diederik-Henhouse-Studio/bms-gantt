@@ -589,6 +589,17 @@ src/
 
 For a deeper architectural tour, see [docs/architectuur.md](docs/architectuur.md).
 
+## Feature catalog
+
+Every public feature lives in [`docs/features/<slug>/`](docs/features) with:
+
+- `feature.md` — human context (why, trade-offs, scope)
+- `contract.yaml` — machine-readable API surface + invariants
+- `scenarios.yaml` — Given/When/Then, agent-executable
+- `examples/*.tsx` — compile-checked snippets
+
+See [`docs/features/README.md`](docs/features/README.md) for the catalog and conventions. The generic scenario runner lives at [`tests/`](tests/README.md).
+
 ## Example app
 
 A live demo lives in [`example/`](example/). It consumes the library via `file:..`, so you can iterate end-to-end:

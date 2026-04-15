@@ -1,0 +1,40 @@
+id: theming
+kind: behavior
+applies_to: "rendered DOM + consumer stylesheet"
+
+css_variables:
+  - name: --gantt-weekend-bg
+    default: "rgb(148 163 184 / 0.12)"
+    used_by: CellGrid weekend shading
+  - name: --gantt-holiday-bg
+    default: "rgb(239 68 68 / 0.1)"
+    used_by: CellGrid holiday shading
+  - name: --gantt-today-color
+    default: "hsl(var(--primary))"
+    used_by: CellGrid today line + Markers today badge background
+  - name: --gantt-today-fg
+    default: "hsl(var(--primary-foreground))"
+    used_by: Markers today badge text
+  - name: --gantt-critical-color
+    default: "rgb(239 68 68)"
+    used_by: RegularBar critical box-shadow
+  - name: --gantt-baseline-bg
+    default: "rgb(148 163 184 / 0.15)"
+    used_by: BaselineBar stripe secondary colour
+  - name: --gantt-baseline-stripe
+    default: "rgb(148 163 184 / 0.35)"
+    used_by: BaselineBar stripe primary colour
+  - name: --gantt-baseline-border
+    default: "rgb(148 163 184 / 0.6)"
+    used_by: BaselineBar dashed border
+
+invariants:
+  - when: "no CSS variable is set"
+    guarantee: "component appearance matches the documented default exactly"
+  - when: "a CSS variable is set on any ancestor of .gantt-container"
+    guarantee: "the relevant painted surface picks up the override on the next paint"
+
+depends_on:
+  - introspection         # tests use data-gantt-* to assert state, not computed styles
+
+breaking_changes: []

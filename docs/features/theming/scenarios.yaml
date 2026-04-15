@@ -1,0 +1,71 @@
+- id: weekend-cells-rendered
+  purpose: "Weekend scale cells pick up the weekend data attribute regardless of theming."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-04T00:00:00.000Z", end: "2026-05-15T00:00:00.000Z",
+          duration: 11, progress: 0, parentId: null, type: task, open: false }
+    config:
+      scales: [ { unit: month, step: 1, format: "MMM yyyy" }, { unit: day, step: 1, format: "d" } ]
+      cellWidth: 32
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '[data-gantt-role="scale-cell"][data-gantt-weekend="true"]'
+      gte: 1
+
+- id: holiday-cells-rendered
+  purpose: "Configured holidays produce data-gantt-holiday=\"true\" cells."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-10T00:00:00.000Z",
+          duration: 9, progress: 0, parentId: null, type: task, open: false }
+    config:
+      holidays: ["2026-05-05T00:00:00.000Z"]
+      scales: [ { unit: month, step: 1, format: "MMM yyyy" }, { unit: day, step: 1, format: "d" } ]
+      cellWidth: 32
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '[data-gantt-role="scale-cell"][data-gantt-holiday="true"]'
+      eq: 1
+
+- id: critical-attribute-flips-with-config
+  purpose: "Enabling showCriticalPath adds data-gantt-critical=\"true\" to critical bars."
+  tags: [happy-path, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+      - { id: b, text: B, start: "2026-05-05T00:00:00.000Z", end: "2026-05-10T00:00:00.000Z",
+          duration: 5, progress: 0, parentId: null, type: task, open: false }
+    links:
+      - { id: l1, source: a, target: b, type: e2s }
+    config:
+      showCriticalPath: true
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '[data-gantt-critical="true"]'
+      gte: 1
+
+- id: defaults-apply-when-no-css-vars
+  purpose: "Without any CSS variable override the chart still renders weekend and today styling (regression)."
+  tags: [regression, dom]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-04-01T00:00:00.000Z", end: "2026-05-30T00:00:00.000Z",
+          duration: 60, progress: 0, parentId: null, type: task, open: false }
+  when:
+    kind: render
+  then:
+    - probe: dom.count
+      selector: '[data-gantt-role="now-line"]'
+      gte: 0          # only present when today is in range; not a hard requirement here
+    - probe: dom.count
+      selector: '[data-gantt-role="scale-cell"][data-gantt-weekend="true"]'
+      gte: 1

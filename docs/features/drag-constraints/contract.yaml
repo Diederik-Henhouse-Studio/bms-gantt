@@ -1,0 +1,54 @@
+id: drag-constraints
+kind: prop-field
+applies_to: GanttTask
+
+exports:
+  - kind: type
+    name: GanttTask
+    path: "@bluemillstudio/gantt"
+    fields:
+      - { name: minDuration, type: "number | undefined", unit: days, description: "Minimum duration; resize clamps to this value." }
+      - { name: maxDuration, type: "number | undefined", unit: days, description: "Maximum duration; resize clamps to this value." }
+      - { name: lockStart,   type: "boolean | undefined",              description: "When true, start date cannot change via drag/resize." }
+      - { name: lockEnd,     type: "boolean | undefined",              description: "When true, end date cannot change via drag/resize." }
+      - { name: noOverlap,   type: "boolean | undefined",              description: "When true, a drag that would overlap a sibling reverts." }
+
+  - kind: function
+    name: applyMoveConstraints
+    path: "@bluemillstudio/gantt/store"
+    signature: "(task: GanttTask, nextStart: Date, nextEnd: Date, all: GanttTask[]) => MoveResult"
+
+  - kind: function
+    name: applyResizeStartConstraints
+    path: "@bluemillstudio/gantt/store"
+    signature: "(task: GanttTask, nextStart: Date, fixedEnd: Date, all: GanttTask[]) => MoveResult"
+
+  - kind: function
+    name: applyResizeEndConstraints
+    path: "@bluemillstudio/gantt/store"
+    signature: "(task: GanttTask, fixedStart: Date, nextEnd: Date, all: GanttTask[]) => MoveResult"
+
+  - kind: type
+    name: MoveResult
+    path: "@bluemillstudio/gantt/store"
+    fields:
+      - { name: start,   type: Date }
+      - { name: end,     type: Date }
+      - { name: blocked, type: boolean, description: "True if a constraint blocked the proposed change." }
+
+invariants:
+  - when: "task.lockStart === true"
+    guarantee: "The commit of a move or resize-start leaves task.start unchanged."
+  - when: "task.lockEnd === true"
+    guarantee: "The commit of a move or resize-end leaves task.end unchanged."
+  - when: "task.minDuration is a positive number"
+    guarantee: "After any commit, (task.end - task.start) in days >= minDuration."
+  - when: "task.maxDuration is a positive number"
+    guarantee: "After any commit, (task.end - task.start) in days <= maxDuration."
+  - when: "task.noOverlap === true"
+    guarantee: "After any commit, task does not overlap any other task sharing the same parentId."
+
+depends_on:
+  - state-management
+
+breaking_changes: []
