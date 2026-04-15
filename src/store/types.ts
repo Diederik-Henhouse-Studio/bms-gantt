@@ -253,6 +253,8 @@ export interface ScaleCell {
   unit: ScaleUnit;
   /** Whether this cell falls on a weekend day (Sat/Sun by default). */
   isWeekend: boolean;
+  /** Whether this cell falls on a configured holiday date. */
+  isHoliday: boolean;
   /** Whether this cell contains today's date. */
   isToday: boolean;
 }

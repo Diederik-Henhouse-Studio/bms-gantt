@@ -285,3 +285,23 @@ describe('ZOOM_PRESETS', () => {
     expect(units).toContain('hour');
   });
 });
+
+describe('generateScaleCells — isHoliday', () => {
+  it('flags cells matching provided holidays', () => {
+    const range = { start: new Date('2026-05-01'), end: new Date('2026-05-10') };
+    const scale = { unit: 'day' as const, step: 1, format: 'd' };
+    const holidays = [new Date('2026-05-05')];
+    const cells = generateScaleCells(range, scale, 32, holidays);
+    const holidayCell = cells.find((c) => c.date.getDate() === 5 && c.date.getMonth() === 4);
+    expect(holidayCell?.isHoliday).toBe(true);
+    const regular = cells.find((c) => c.date.getDate() === 6 && c.date.getMonth() === 4);
+    expect(regular?.isHoliday).toBe(false);
+  });
+
+  it('omits isHoliday when holidays not supplied (defaults to false)', () => {
+    const range = { start: new Date('2026-05-01'), end: new Date('2026-05-05') };
+    const scale = { unit: 'day' as const, step: 1, format: 'd' };
+    const cells = generateScaleCells(range, scale, 32);
+    expect(cells.every((c) => c.isHoliday === false)).toBe(true);
+  });
+});
