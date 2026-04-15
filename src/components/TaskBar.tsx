@@ -158,6 +158,20 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
   const progressPct = Math.max(0, Math.min(100, task.progress));
   const { renderTaskBar } = useSlots();
   const customContent = renderTaskBar?.(task);
+  const isCritical = !!task.critical;
+
+  // Task status affects opacity / decoration.
+  const statusStyle: React.CSSProperties = {};
+  if (task.status === 'paused') {
+    statusStyle.opacity = 0.55;
+    statusStyle.backgroundImage =
+      'repeating-linear-gradient(45deg, transparent 0 6px, rgba(0,0,0,0.15) 6px 12px)';
+  } else if (task.status === 'cancelled') {
+    statusStyle.opacity = 0.35;
+    statusStyle.textDecoration = 'line-through';
+  } else if (task.status === 'completed') {
+    statusStyle.opacity = 0.85;
+  }
 
   return (
     <div
@@ -165,7 +179,6 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         'absolute rounded-sm overflow-hidden select-none',
         !colors.custom && colors.bg,
         isSelected && 'ring-2 ring-primary ring-offset-1',
-        task.critical && !isSelected && 'ring-2 ring-red-500',
       )}
       style={{
         left: task.$x,
@@ -174,7 +187,14 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         height: task.$h,
         ...(colors.custom ? { backgroundColor: colors.custom } : {}),
         cursor: readonly ? 'default' : 'grab',
+        ...(isCritical && !isSelected
+          ? { boxShadow: '0 0 0 2px rgb(239 68 68), 0 0 6px rgba(239,68,68,0.4)' }
+          : {}),
+        ...statusStyle,
       }}
+      title={`${task.text}\n${task.start.toLocaleDateString()} → ${task.end.toLocaleDateString()}${
+        task.slack != null ? ` · slack ${task.slack}d` : ''
+      }`}
       onClick={(e) => onSelect(task.id, e)}
       onDoubleClick={() => onDoubleClick(task.id)}
       onMouseDown={!readonly ? (e) => {
@@ -255,22 +275,27 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
 function BaselineBar({ task }: { task: GanttTask }) {
   if (!task.baseStart || !task.baseEnd) return null;
 
-  // Use pre-computed baseline positions if available, otherwise skip
-  // (the store's positionBaselines should set these)
-  const bx = (task as any).$bx as number | undefined;
-  const bw = (task as any).$bw as number | undefined;
+  const bx = task.$bx;
+  const bw = task.$bw;
 
   if (bx == null || bw == null) return null;
 
+  // Render as a full-height striped shadow bar *behind* the live bar.
+  // Visually conveys the original plan while keeping the live bar legible on top.
   return (
     <div
-      className="absolute bg-muted-foreground/40 rounded-sm pointer-events-none"
+      className="absolute rounded-sm pointer-events-none"
       style={{
         left: bx,
-        top: task.$y + task.$h + 2,
+        top: task.$y,
         width: bw,
-        height: 4,
+        height: task.$h,
+        zIndex: 0,
+        background:
+          'repeating-linear-gradient(45deg, rgb(148 163 184 / 0.35) 0 6px, rgb(148 163 184 / 0.15) 6px 12px)',
+        border: '1px dashed rgb(148 163 184 / 0.6)',
       }}
+      aria-hidden="true"
     />
   );
 }
@@ -282,12 +307,12 @@ export function TaskBar(props: TaskBarProps) {
 
   return (
     <>
+      {/* Baseline rendered first so it sits behind the live bar */}
+      <BaselineBar task={task} />
+
       {task.type === 'milestone' && <MilestoneBar {...props} />}
       {task.type === 'summary' && <SummaryBar {...props} />}
       {task.type === 'task' && <RegularBar {...props} />}
-
-      {/* Baseline (shown below the main bar for any type) */}
-      <BaselineBar task={task} />
     </>
   );
 }

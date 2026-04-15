@@ -116,7 +116,7 @@ const ganttStateCreator: StateCreator<GanttState> = (set, get) => {
     const dateRange = calcDateRange(summarised, markers);
 
     // 4. Generate scale cells
-    const scaleCells = generateAllScaleCells(dateRange, config.scales, config.cellWidth);
+    const scaleCells = generateAllScaleCells(dateRange, config.scales, config.cellWidth, config.holidays);
 
     // 5. Total pixel width
     const totalWidth = calcTotalWidth(scaleCells);

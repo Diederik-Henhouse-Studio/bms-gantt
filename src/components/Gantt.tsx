@@ -6,7 +6,7 @@
 // E1: Error boundary wraps GanttLayout; validation runs before store sync.
 // ─────────────────────────────────────────────────────────────
 
-import React, { useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 import { cn } from '../utils/cn';
 import { validateGanttInput } from '../utils/validateTasks';
 
@@ -41,7 +41,7 @@ export interface GanttProps {
 
 // ── Component ────────────────────────────────────────────────
 
-export function Gantt({
+export const Gantt = forwardRef<HTMLDivElement, GanttProps>(function Gantt({
   tasks,
   links = [],
   markers = [],
@@ -55,7 +55,7 @@ export function Gantt({
   onLinkCreate,
   onLinkDelete,
   onError,
-}: GanttProps) {
+}, ref) {
   const store = useGanttStore;
   const initialised = useRef(false);
 
@@ -121,6 +121,7 @@ export function Gantt({
 
   return (
     <div
+      ref={ref}
       className={cn(
         'gantt-container w-full h-full flex flex-col overflow-hidden border rounded-lg bg-background',
         className,
@@ -141,6 +142,8 @@ export function Gantt({
       </GanttErrorBoundary>
     </div>
   );
-}
+});
+
+Gantt.displayName = 'Gantt';
 
 export default Gantt;

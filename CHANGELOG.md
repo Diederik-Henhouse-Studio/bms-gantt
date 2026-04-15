@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-15
+
+### Fixed (audit sprint 1)
+- **forwardRef on `<Gantt>`** — no more React warning, consumers can attach a ref.
+- **Baseline bars now render as a full-height striped shadow behind the live bar** (previously a barely-visible 4px strip below).
+- **Critical path styling upgraded** — uses an inline box-shadow so the red outline is visible regardless of Tailwind configuration. Title attribute now includes slack days when available.
+- **Weekend & holiday shading upgraded** — uses explicit fill opacity instead of Tailwind `/20` modifier which was inconsistent; holidays get a warmer (red-tinted) colour to distinguish them from weekends.
+
+### Added
+- **Task status visual differentiation** — `paused` tasks render with a diagonal-stripe overlay at 55% opacity; `cancelled` tasks at 35% opacity with strikethrough; `completed` tasks at 85% opacity.
+- **`ScaleCell.isHoliday`** flag. `generateScaleCells` now accepts an optional `holidays: Date[]` parameter (defaults to `[]`).
+- Bar `title` attribute with start, end, and slack — acts as a minimal native tooltip.
+
+### Deferred to next audit sprint
+- Audit A1 split tasks (requires positioning refactor; tracked in #18)
+- Audit A5 category colour verification in a live consumer (tracked in #22)
+- Audit A7+ sprint-2 items (#24–#28) and theming (#29–#31)
+
 ## [0.4.1] - 2026-04-14
 
 ### Changed

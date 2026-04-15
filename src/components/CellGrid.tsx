@@ -28,17 +28,19 @@ export const CellGrid: React.FC<CellGridProps> = memo(
     const cellHeight = config.cellHeight;
 
     // Pre-compute grid elements to avoid work during render
-    const { verticalLines, weekendRects, todayLine, horizontalLines, groupHeaderRects, groupSeparatorLines } =
+    const { verticalLines, weekendRects, holidayRects, todayLine, horizontalLines, groupHeaderRects, groupSeparatorLines } =
       useMemo(() => {
         const vLines: { x: number; key: string }[] = [];
         const wRects: { x: number; width: number; key: string }[] = [];
+        const hRects: { x: number; width: number; key: string }[] = [];
         let tLine: { x: number } | null = null;
 
-        // Vertical lines + weekend rects + today marker
+        // Vertical lines + weekend/holiday rects + today marker
         let x = 0;
         for (const cell of scaleCells) {
-          // Weekend shading
-          if (cell.isWeekend) {
+          if (cell.isHoliday) {
+            hRects.push({ x, width: cell.width, key: `h-${cell.key}` });
+          } else if (cell.isWeekend) {
             wRects.push({ x, width: cell.width, key: `w-${cell.key}` });
           }
 
@@ -111,6 +113,7 @@ export const CellGrid: React.FC<CellGridProps> = memo(
         return {
           verticalLines: vLines,
           weekendRects: wRects,
+          holidayRects: hRects,
           todayLine: tLine,
           horizontalLines: hLines,
           groupHeaderRects: gHeaderRects,
@@ -132,8 +135,21 @@ export const CellGrid: React.FC<CellGridProps> = memo(
             y={0}
             width={r.width}
             height={totalHeight}
-            className="text-muted/20"
-            fill="currentColor"
+            fill="rgb(148 163 184)"
+            fillOpacity={0.12}
+          />
+        ))}
+
+        {/* Holiday column shading (warmer tint to distinguish from weekends) */}
+        {holidayRects.map((r) => (
+          <rect
+            key={r.key}
+            x={r.x}
+            y={0}
+            width={r.width}
+            height={totalHeight}
+            fill="rgb(239 68 68)"
+            fillOpacity={0.1}
           />
         ))}
 

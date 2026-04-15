@@ -132,7 +132,19 @@ export function generateScaleCells(
   dateRange: DateRange,
   scale: GanttScale,
   cellWidth: number,
+  holidays: Date[] = [],
 ): ScaleCell[] {
+  // Pre-index holidays by yyyy-mm-dd for O(1) lookup per cell.
+  const holidaySet = new Set<string>();
+  for (const h of holidays) {
+    if (h instanceof Date && !isNaN(h.getTime())) {
+      holidaySet.add(
+        `${h.getFullYear()}-${h.getMonth()}-${h.getDate()}`,
+      );
+    }
+  }
+  const isHolidayDate = (d: Date): boolean =>
+    holidaySet.has(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`);
   const cells: ScaleCell[] = [];
   const { start, end } = dateRange;
   const step = scale.step ?? 1;
@@ -176,6 +188,7 @@ export function generateScaleCells(
       width: Math.max(width, 0),
       unit: scale.unit,
       isWeekend: isWeekend(current),
+      isHoliday: isHolidayDate(current),
       isToday: isSameDay(current, new Date()),
     });
 
@@ -192,8 +205,11 @@ export function generateAllScaleCells(
   dateRange: DateRange,
   scales: GanttScale[],
   cellWidth: number,
+  holidays: Date[] = [],
 ): ScaleCell[][] {
-  return scales.map((scale) => generateScaleCells(dateRange, scale, cellWidth));
+  return scales.map((scale) =>
+    generateScaleCells(dateRange, scale, cellWidth, holidays),
+  );
 }
 
 /**
