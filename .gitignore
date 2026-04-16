@@ -13,3 +13,11 @@ reference/
 example/dist/
 example/node_modules/
 example/package-lock.json
+testing/app/dist/
+testing/app/node_modules/
+testing/app/package-lock.json
+testing/node_modules/
+testing/package-lock.json
+testing/screenshots/
+testing/crawl4ai/report.json
+testing/test-results/
