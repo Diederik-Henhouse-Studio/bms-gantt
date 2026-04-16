@@ -1,6 +1,6 @@
 {
   "name": "@bluemillstudio/gantt",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "type": "commonjs",
   "description": "Interactive Gantt chart component for React — drag & drop, dependencies, critical path, auto-scheduling",
   "author": "Blue Mill Studio",
@@ -88,6 +88,7 @@
     "check:scenarios": "node scripts/check-scenarios.mjs",
     "check:catalog": "node scripts/generate-catalog.mjs --check",
     "check:pkg": "npx publint && npx @arethetypeswrong/cli --pack .",
+    "check:bundlesize": "node scripts/check-bundlesize.mjs",
     "docs:catalog": "node scripts/generate-catalog.mjs",
     "test": "vitest run",
     "test:watch": "vitest",

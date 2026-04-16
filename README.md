@@ -42,7 +42,19 @@ npm install @bluemillstudio/gantt
 }
 ```
 
-The component also expects **Tailwind CSS** and the shadcn/ui CSS variables to be available — see [Styling & Theming](#styling--theming).
+The component uses **Tailwind CSS** utility classes internally. To ensure they're included in your CSS bundle, add the package's dist to your Tailwind `content` config:
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: [
+    './src/**/*.{ts,tsx}',
+    './node_modules/@bluemillstudio/gantt/dist/**/*.{js,mjs}', // ← add this
+  ],
+};
+```
+
+You also need the shadcn/ui CSS variables — see [Styling & Theming](#styling--theming).
 
 ## Quick Start
 
