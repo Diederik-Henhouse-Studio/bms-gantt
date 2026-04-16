@@ -11,6 +11,7 @@ import type { GanttTask, GanttLink } from '../store';
 import GanttGrid from './GanttGrid';
 import GanttChart from './GanttChart';
 import GanttToolbar from './GanttToolbar';
+import { useLabels } from '../i18n';
 
 // ── Constants ────────────────────────────────────────────────
 
@@ -39,6 +40,8 @@ export function GanttLayout({
   onLinkDelete,
 }: GanttLayoutProps) {
   const showToolbar = useGanttStore((s) => s.config.showToolbar);
+  const isEmpty = useGanttStore((s) => s.flatTasks.length === 0);
+  const labels = useLabels();
 
   // ── Grid width (local state) ───────────────────────────────
 
@@ -261,7 +264,7 @@ export function GanttLayout({
         />
 
         {/* ── Right: GanttChart (fills remaining space, scrolls both ways) */}
-        <div ref={chartContainerRef} className="flex-1 min-w-0 overflow-auto">
+        <div ref={chartContainerRef} className="flex-1 min-w-0 overflow-auto relative">
           <GanttChart
             onTaskClick={onTaskClick}
             onTaskDoubleClick={onTaskDoubleClick}
@@ -269,6 +272,16 @@ export function GanttLayout({
             onLinkCreate={onLinkCreate}
             onLinkDelete={onLinkDelete}
           />
+          {isEmpty && (
+            <div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              style={{ zIndex: 20 }}
+            >
+              <span className="text-sm px-4 py-2 rounded-md" style={{ color: '#6b7280', backgroundColor: 'rgba(243,244,246,0.9)' }}>
+                {labels.emptyState}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

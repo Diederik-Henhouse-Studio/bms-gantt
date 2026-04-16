@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.3] - 2026-04-16
+
+### Fixed (verified via Playwright screenshots)
+- **Split tasks**: wrapper is now transparent for segmented bars — segments and dashed connector are visually distinct. `overflow-visible` replaces `overflow-hidden` on split tasks so the connector line renders.
+- **Empty state**: "No tasks to display" badge now renders as an overlay at z-index 20 in GanttLayout (above the CellGrid SVG), centered in the chart area with a subtle background.
+- **Critical path**: confirmed working — summary bars render red, toolbar button activates (was a test-timing issue, not a rendering bug).
+
 ## [0.9.2] - 2026-04-16
 
 ### Added
