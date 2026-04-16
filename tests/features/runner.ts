@@ -107,9 +107,14 @@ export function resolve_(value: any, fixtures: Record<string, any>): any {
 /** Convert fixture objects with ISO date strings into GanttTask-shaped objects. */
 function hydrateFixture(f: any): any {
   if (!f || typeof f !== 'object') return f;
+  if (Array.isArray(f)) return f.map(hydrateFixture);
   const out: any = { ...f };
   for (const k of ['start', 'end', 'baseStart', 'baseEnd', 'date']) {
     if (typeof out[k] === 'string') out[k] = new Date(out[k]);
+  }
+  // Hydrate nested arrays (e.g. config.holidays)
+  if (Array.isArray(out.holidays)) {
+    out.holidays = out.holidays.map((h: any) => (typeof h === 'string' ? new Date(h) : h));
   }
   // Defaults expected on GanttTask so compute fields don't choke.
   if ('id' in out || 'text' in out) {
@@ -134,7 +139,7 @@ export function prepareSetup(s: Scenario): { fixtures: Record<string, any>; task
     tasks: mapDates(s.setup?.tasks),
     links: s.setup?.links ?? [],
     markers: mapDates(s.setup?.markers),
-    config: s.setup?.config ?? {},
+    config: hydrateFixture(s.setup?.config ?? {}),
     labels: s.setup?.labels,
   };
 }
