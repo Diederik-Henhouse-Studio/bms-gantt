@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  # Builds the library + starts a Vite dev server that renders scenario pages.
+  app:
+    build:
+      context: ..
+      dockerfile: testing/Dockerfile
+      target: app
+    ports:
+      - "5199:5199"
+    volumes:
+      - screenshots:/app/testing/screenshots
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5199"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+  # Runs Playwright tests against the app service.
+  playwright:
+    build:
+      context: ..
+      dockerfile: testing/Dockerfile
+      target: playwright
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - BASE_URL=http://app:5199
+    volumes:
+      - screenshots:/app/testing/screenshots
+
+  # Runs Crawl4AI analysis for AI-powered layout validation.
+  crawl4ai:
+    build:
+      context: ..
+      dockerfile: testing/Dockerfile
+      target: crawl4ai
+    depends_on:
+      app:
+        condition: service_healthy
+    environment:
+      - BASE_URL=http://app:5199
+
+volumes:
+  screenshots:
