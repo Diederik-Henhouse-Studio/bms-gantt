@@ -22,9 +22,9 @@ export interface UseDragReturn {
   isDragging: boolean;
   /** The type of the active drag, or null when idle. */
   dragType: DragState['type'] | null;
-  /** Initiates a drag on mousedown. Attach to task bar elements. */
-  handleMouseDown: (
-    e: React.MouseEvent,
+  /** Initiates a drag on pointerdown. Attach to task bar elements. */
+  handlePointerDown: (
+    e: React.PointerEvent,
     taskId: string,
     type: DragState['type'],
   ) => void;
@@ -45,35 +45,59 @@ export function useDrag({ readonly, onTaskUpdate }: UseDragOptions): UseDragRetu
 
   // Refs for the global listeners so we can remove them on cleanup.
   const listenersRef = useRef<{
-    onMouseMove: (e: MouseEvent) => void;
-    onMouseUp: (e: MouseEvent) => void;
+    onPointerMove: (e: PointerEvent) => void;
+    onPointerUp: (e: PointerEvent) => void;
+    onPointerCancel: (e: PointerEvent) => void;
+  } | null>(null);
+  const capturedPointerRef = useRef<{
+    element: Element;
+    pointerId: number;
   } | null>(null);
 
   // ── Cleanup helper ───────────────────────────────────────────
 
   const removeListeners = useCallback(() => {
     if (listenersRef.current) {
-      document.removeEventListener('mousemove', listenersRef.current.onMouseMove);
-      document.removeEventListener('mouseup', listenersRef.current.onMouseUp);
+      document.removeEventListener('pointermove', listenersRef.current.onPointerMove);
+      document.removeEventListener('pointerup', listenersRef.current.onPointerUp);
+      document.removeEventListener('pointercancel', listenersRef.current.onPointerCancel);
       listenersRef.current = null;
     }
   }, []);
 
-  // ── Mouse down ───────────────────────────────────────────────
+  const releasePointerCapture = useCallback(() => {
+    const captured = capturedPointerRef.current;
+    if (captured && captured.element.hasPointerCapture?.(captured.pointerId)) {
+      captured.element.releasePointerCapture(captured.pointerId);
+    }
+    capturedPointerRef.current = null;
+  }, []);
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent, taskId: string, type: DragState['type']) => {
+  // ── Pointer down ─────────────────────────────────────────────
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent, taskId: string, type: DragState['type']) => {
       if (readonly) return;
 
-      // Only respond to primary button.
+      // Only respond to primary pointer / primary button.
+      if (!e.isPrimary) return;
       if (e.button !== 0) return;
 
       e.preventDefault();
       e.stopPropagation();
 
+      e.currentTarget.setPointerCapture(e.pointerId);
+      capturedPointerRef.current = {
+        element: e.currentTarget,
+        pointerId: e.pointerId,
+      };
+
       const store = useGanttStore.getState();
       const task = store.tasks.find((t) => t.id === taskId);
-      if (!task) return;
+      if (!task) {
+        releasePointerCapture();
+        return;
+      }
 
       // Snapshot the task before mutation.
       originalTaskRef.current = { ...task };
@@ -92,15 +116,17 @@ export function useDrag({ readonly, onTaskUpdate }: UseDragOptions): UseDragRetu
       setIsDragging(true);
       setDragType(type);
 
-      // ── Global mousemove ──────────────────────────────────────
+      // ── Global pointermove ────────────────────────────────────
 
-      const onMouseMove = (ev: MouseEvent) => {
+      const onPointerMove = (ev: PointerEvent) => {
+        if (ev.pointerId !== e.pointerId) return;
         useGanttStore.getState().updateDrag(ev.clientX, ev.clientY);
       };
 
-      // ── Global mouseup ────────────────────────────────────────
+      // ── Global pointerup / pointercancel ──────────────────────
 
-      const onMouseUp = (_ev: MouseEvent) => {
+      const finishDrag = (ev: PointerEvent) => {
+        if (ev.pointerId !== e.pointerId) return;
         const currentStore = useGanttStore.getState();
         currentStore.endDrag();
 
@@ -123,24 +149,31 @@ export function useDrag({ readonly, onTaskUpdate }: UseDragOptions): UseDragRetu
         }
 
         originalTaskRef.current = null;
+        releasePointerCapture();
         removeListeners();
       };
 
       // Attach global listeners.
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-      listenersRef.current = { onMouseMove, onMouseUp };
+      document.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('pointerup', finishDrag);
+      document.addEventListener('pointercancel', finishDrag);
+      listenersRef.current = {
+        onPointerMove,
+        onPointerUp: finishDrag,
+        onPointerCancel: finishDrag,
+      };
     },
-    [readonly, removeListeners],
+    [readonly, releasePointerCapture, removeListeners],
   );
 
   // ── Cleanup on unmount ────────────────────────────────────────
 
   useEffect(() => {
     return () => {
+      releasePointerCapture();
       removeListeners();
     };
-  }, [removeListeners]);
+  }, [releasePointerCapture, removeListeners]);
 
-  return { isDragging, dragType, handleMouseDown };
+  return { isDragging, dragType, handlePointerDown };
 }

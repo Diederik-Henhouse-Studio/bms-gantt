@@ -47,6 +47,10 @@ export function GanttLayout({
 
   const [gridWidth, setGridWidth] = useState(GRID_DEFAULT_WIDTH);
   const isDragging = useRef(false);
+  const capturedPointerRef = useRef<{
+    element: Element;
+    pointerId: number;
+  } | null>(null);
   const dragStartX = useRef(0);
   const dragStartWidth = useRef(0);
 
@@ -67,7 +71,7 @@ export function GanttLayout({
 
   // ── Divider drag handlers ──────────────────────────────────
 
-  // Shared start-drag logic for mouse and touch
+  // Shared start-drag logic for pointer input
   const startDividerDrag = useCallback(
     (clientX: number) => {
       isDragging.current = true;
@@ -79,25 +83,31 @@ export function GanttLayout({
     [gridWidth],
   );
 
-  const handleDividerMouseDown = useCallback(
-    (e: React.MouseEvent) => {
+  const handleDividerPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!e.isPrimary) return;
+      if (e.button !== 0) return;
+
       e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      capturedPointerRef.current = {
+        element: e.currentTarget,
+        pointerId: e.pointerId,
+      };
       startDividerDrag(e.clientX);
     },
     [startDividerDrag],
   );
 
-  // H8: touch support voor tablet/mobiel
-  const handleDividerTouchStart = useCallback(
-    (e: React.TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      e.preventDefault();
-      startDividerDrag(e.touches[0].clientX);
-    },
-    [startDividerDrag],
-  );
-
   useEffect(() => {
+    function releasePointerCapture() {
+      const captured = capturedPointerRef.current;
+      if (captured && captured.element.hasPointerCapture?.(captured.pointerId)) {
+        captured.element.releasePointerCapture(captured.pointerId);
+      }
+      capturedPointerRef.current = null;
+    }
+
     function updateWidth(clientX: number) {
       const delta = clientX - dragStartX.current;
       const newWidth = Math.min(
@@ -107,36 +117,30 @@ export function GanttLayout({
       setGridWidth(newWidth);
     }
 
-    function handleMouseMove(e: MouseEvent) {
+    function handlePointerMove(e: PointerEvent) {
       if (!isDragging.current) return;
+      if (e.pointerId !== capturedPointerRef.current?.pointerId) return;
       updateWidth(e.clientX);
     }
 
-    function handleTouchMove(e: TouchEvent) {
-      if (!isDragging.current || e.touches.length !== 1) return;
-      e.preventDefault();
-      updateWidth(e.touches[0].clientX);
-    }
-
-    function handleEnd() {
+    function handleEnd(e: PointerEvent) {
       if (!isDragging.current) return;
+      if (e.pointerId !== capturedPointerRef.current?.pointerId) return;
       isDragging.current = false;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
+      releasePointerCapture();
     }
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleEnd);
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleEnd);
-    document.addEventListener('touchcancel', handleEnd);
+    document.addEventListener('pointermove', handlePointerMove);
+    document.addEventListener('pointerup', handleEnd);
+    document.addEventListener('pointercancel', handleEnd);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleEnd);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleEnd);
-      document.removeEventListener('touchcancel', handleEnd);
+      releasePointerCapture();
+      document.removeEventListener('pointermove', handlePointerMove);
+      document.removeEventListener('pointerup', handleEnd);
+      document.removeEventListener('pointercancel', handleEnd);
     };
   }, []);
 
@@ -254,9 +258,8 @@ export function GanttLayout({
         {/* ── Divider ───────────────────────────────────────── */}
         <div
           className="flex-shrink-0 bg-border hover:bg-primary/20 transition-colors"
-          style={{ width: DIVIDER_WIDTH, cursor: 'col-resize' }}
-          onMouseDown={handleDividerMouseDown}
-          onTouchStart={handleDividerTouchStart}
+          style={{ width: DIVIDER_WIDTH, cursor: 'col-resize', touchAction: 'none' }}
+          onPointerDown={handleDividerPointerDown}
           role="separator"
           tabIndex={0}
           aria-orientation="vertical"

@@ -16,6 +16,7 @@ import {
   flexRender,
   createColumnHelper,
   type ColumnDef,
+  type Header,
 } from '@tanstack/react-table';
 import { useGanttStore } from '../store';
 import type { GanttTask, LaneGroup } from '../store/types';
@@ -331,6 +332,60 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
     enableColumnFilters: true,
   });
 
+  const handleHeaderResizePointerDown = useCallback(
+    (header: Header<GanttTask, unknown>, e: React.PointerEvent<HTMLDivElement>) => {
+      if (!e.isPrimary) return;
+      if (e.button !== 0) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const target = e.currentTarget;
+      const pointerId = e.pointerId;
+      const startX = e.clientX;
+      const startSize = header.getSize();
+      const minSize = header.column.columnDef.minSize ?? 20;
+      const maxSize = header.column.columnDef.maxSize ?? Number.MAX_SAFE_INTEGER;
+
+      target.setPointerCapture(pointerId);
+
+      const updateSize = (clientX: number) => {
+        const nextSize = Math.min(
+          maxSize,
+          Math.max(minSize, startSize + clientX - startX),
+        );
+        table.setColumnSizing((old) => ({
+          ...old,
+          [header.column.id]: nextSize,
+        }));
+      };
+
+      const releasePointerCapture = () => {
+        if (target.hasPointerCapture(pointerId)) {
+          target.releasePointerCapture(pointerId);
+        }
+      };
+
+      const handlePointerMove = (ev: PointerEvent) => {
+        if (ev.pointerId !== pointerId) return;
+        updateSize(ev.clientX);
+      };
+
+      const handlePointerEnd = (ev: PointerEvent) => {
+        if (ev.pointerId !== pointerId) return;
+        releasePointerCapture();
+        window.removeEventListener('pointermove', handlePointerMove);
+        window.removeEventListener('pointerup', handlePointerEnd);
+        window.removeEventListener('pointercancel', handlePointerEnd);
+      };
+
+      window.addEventListener('pointermove', handlePointerMove);
+      window.addEventListener('pointerup', handlePointerEnd);
+      window.addEventListener('pointercancel', handlePointerEnd);
+    },
+    [table],
+  );
+
   // ── Shared header renderer ────────────────────────────
   const renderTableHeader = () => (
     <thead>
@@ -350,8 +405,7 @@ export const GanttGrid: React.FC<GanttGridProps> = ({ width }) => {
                 : flexRender(header.column.columnDef.header, header.getContext())}
               {header.column.getCanResize() && (
                 <div
-                  onMouseDown={header.getResizeHandler()}
-                  onTouchStart={header.getResizeHandler()}
+                  onPointerDown={(e) => handleHeaderResizePointerDown(header, e)}
                   className={`absolute right-0 top-0 h-full w-1 cursor-col-resize select-none touch-none hover:bg-primary/30 ${
                     header.column.getIsResizing() ? 'bg-primary/50' : ''
                   }`}

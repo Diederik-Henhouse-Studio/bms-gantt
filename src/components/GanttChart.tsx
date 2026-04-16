@@ -105,11 +105,14 @@ export function GanttChart({
   // ── Grab-scroll (middle-click or Shift+drag) ───────────────
 
   const isGrabScrolling = useRef(false);
+  const grabPointer = useRef<{ element: Element; pointerId: number } | null>(null);
   const grabStart = useRef({ x: 0, y: 0, scrollLeft: 0, scrollTop: 0 });
   const [shiftHeld, setShiftHeld] = useState(false);
 
   const handleGrabStart = useCallback(
-    (e: React.MouseEvent) => {
+    (e: React.PointerEvent) => {
+      if (!e.isPrimary) return;
+
       // Middle-click or Shift+left-click
       const isMiddle = e.button === 1;
       const isShiftLeft = e.button === 0 && e.shiftKey;
@@ -119,8 +122,10 @@ export function GanttChart({
       if (!el) return;
 
       e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
 
       isGrabScrolling.current = true;
+      grabPointer.current = { element: e.currentTarget, pointerId: e.pointerId };
       grabStart.current = {
         x: e.clientX,
         y: e.clientY,
@@ -133,8 +138,17 @@ export function GanttChart({
   );
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const releasePointerCapture = () => {
+      const captured = grabPointer.current;
+      if (captured && captured.element.hasPointerCapture?.(captured.pointerId)) {
+        captured.element.releasePointerCapture(captured.pointerId);
+      }
+      grabPointer.current = null;
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
       if (!isGrabScrolling.current) return;
+      if (e.pointerId !== grabPointer.current?.pointerId) return;
       const el = scrollContainerRef.current;
       if (!el) return;
 
@@ -144,20 +158,25 @@ export function GanttChart({
       el.scrollTop = grabStart.current.scrollTop - dy;
     };
 
-    const handleMouseUp = () => {
+    const handlePointerEnd = (e: PointerEvent) => {
       if (!isGrabScrolling.current) return;
+      if (e.pointerId !== grabPointer.current?.pointerId) return;
       isGrabScrolling.current = false;
       const el = scrollContainerRef.current;
       if (el) {
         el.style.cursor = '';
       }
+      releasePointerCapture();
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerEnd);
+    window.addEventListener('pointercancel', handlePointerEnd);
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      releasePointerCapture();
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerEnd);
+      window.removeEventListener('pointercancel', handlePointerEnd);
     };
   }, []);
 
@@ -204,7 +223,7 @@ export function GanttChart({
         className="flex-1 overflow-auto relative"
         ref={scrollContainerRef}
         onScroll={handleScroll}
-        onMouseDown={handleGrabStart}
+        onPointerDown={handleGrabStart}
         style={shiftHeld ? { cursor: 'grab' } : undefined}
       >
         <div
