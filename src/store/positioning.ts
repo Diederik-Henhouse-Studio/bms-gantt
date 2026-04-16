@@ -42,7 +42,17 @@ export function positionTasks(
       $h = config.barHeight;
     }
 
-    return { ...task, $x, $y, $w, $h };
+    // Compute per-segment pixel positions when the task is split.
+    let segments = task.segments;
+    if (segments && segments.length > 0) {
+      segments = segments.map((seg) => {
+        const sx = dateToX(seg.start, dateRange, totalWidth);
+        const sxEnd = dateToX(seg.end, dateRange, totalWidth);
+        return { ...seg, $x: sx, $w: Math.max(sxEnd - sx, 4) };
+      });
+    }
+
+    return { ...task, $x, $y, $w, $h, segments };
   });
 }
 
@@ -123,7 +133,16 @@ export function positionTasksMultiRow(
       $h = config.barHeight;
     }
 
-    return { ...task, $x, $y, $w, $h };
+    let segments = task.segments;
+    if (segments && segments.length > 0) {
+      segments = segments.map((seg) => {
+        const sx = dateToX(seg.start, dateRange, totalWidth);
+        const sxEnd = dateToX(seg.end, dateRange, totalWidth);
+        return { ...seg, $x: sx, $w: Math.max(sxEnd - sx, 4) };
+      });
+    }
+
+    return { ...task, $x, $y, $w, $h, segments };
   });
 }
 

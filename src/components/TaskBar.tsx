@@ -260,6 +260,50 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
     >
       {customContent !== undefined ? (
         <div className="relative z-10 w-full h-full">{customContent}</div>
+      ) : task.segments && task.segments.length > 0 ? (
+        /* ── Split task: render each segment as a separate bar ── */
+        <>
+          {task.segments.map((seg, i) => {
+            const relX = seg.$x - task.$x;
+            return (
+              <div
+                key={i}
+                data-gantt-role="segment"
+                data-gantt-segment={i}
+                className={cn(
+                  'absolute inset-y-0 rounded-sm',
+                  !colors.custom && colors.bg,
+                )}
+                style={{
+                  left: relX,
+                  width: seg.$w,
+                  ...(colors.custom ? { backgroundColor: colors.custom } : {}),
+                }}
+              >
+                {i === 0 && (
+                  <div className="relative z-10 flex items-center h-full px-1">
+                    <span className="text-xs text-white truncate">{task.text}</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          {/* Dashed connector between segments */}
+          {task.segments.length > 1 && (
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                left: task.segments[0].$x - task.$x + task.segments[0].$w,
+                right: task.$w - (task.segments[task.segments.length - 1].$x - task.$x),
+                top: '50%',
+                height: 0,
+                borderTop: '2px dashed',
+                borderColor: colors.custom ?? 'currentColor',
+                opacity: 0.5,
+              }}
+            />
+          )}
+        </>
       ) : (
         <>
           {/* Progress fill */}

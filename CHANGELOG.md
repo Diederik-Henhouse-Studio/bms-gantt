@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-04-16
+
+### Fixed
+- **Split tasks now render as segmented bars** (#18, audit A1). Tasks with `segments[]` show separate coloured blocks per segment with a dashed connector between gaps. Positioning computes per-segment `$x/$w` in both single-row and multi-row mode. Each segment gets a `data-gantt-role="segment"` DOM attribute.
+
+### Tests: 252 → 254 (+2 splitTasks).
+
 ## [0.9.0] - 2026-04-16
 
 ### Added
