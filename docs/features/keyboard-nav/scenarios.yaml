@@ -1,0 +1,33 @@
+- id: arrow-down-selects-next
+  purpose: "ArrowDown moves selection to the next task."
+  tags: [happy-path, interaction]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+      - { id: b, text: B, start: "2026-05-05T00:00:00.000Z", end: "2026-05-10T00:00:00.000Z",
+          duration: 5, progress: 0, parentId: null, type: task, open: false }
+    seed_store:
+      selectedTaskIds: ["a"]
+  when:
+    kind: keydown
+    key: ArrowDown
+  then:
+    - probe: handle.snapshot.bars
+      all: {}
+
+- id: escape-clears-selection
+  purpose: "Escape clears the current selection."
+  tags: [happy-path, interaction]
+  setup:
+    tasks:
+      - { id: a, text: A, start: "2026-05-01T00:00:00.000Z", end: "2026-05-05T00:00:00.000Z",
+          duration: 4, progress: 0, parentId: null, type: task, open: false }
+    seed_store:
+      selectedTaskIds: ["a"]
+  when:
+    kind: keydown
+    key: Escape
+  then:
+    - probe: handle.snapshot.bars.length
+      eq: 1

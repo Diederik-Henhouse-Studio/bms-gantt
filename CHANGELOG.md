@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-04-16
+
+### Added
+- **Keyboard navigation** (#30): Arrow Up/Down to navigate tasks, Enter to open editor, Space to toggle, Escape to clear. All keys ignored in inputs. New `keyboard-nav` feature in the catalog.
+- 100/100 public exports documented. 17 features catalogued. 47 scenarios.
+
 ## [0.9.1] - 2026-04-16
 
 ### Fixed

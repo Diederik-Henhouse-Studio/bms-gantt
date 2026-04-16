@@ -140,37 +140,90 @@ export function GanttLayout({
   // ── Keyboard shortcuts (undo/redo) ─────────────────────────
 
   useEffect(() => {
+    function isEditable(target: HTMLElement | null): boolean {
+      return !!(
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      );
+    }
+
     function handleKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+
+      // ── Undo / Redo ────────────────────────────────────
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
         e.preventDefault();
         useGanttStore.getState().undo();
+        return;
       }
       if ((e.ctrlKey || e.metaKey) && e.key === 'z' && e.shiftKey) {
         e.preventDefault();
         useGanttStore.getState().redo();
+        return;
       }
-      // Delete selected tasks (ignore when focus is in an editable input).
+
+      if (isEditable(target)) return;
+
+      const state = useGanttStore.getState();
+      const { flatTasks, selectedTaskIds } = state;
+
+      // ── Delete ─────────────────────────────────────────
       if (e.key === 'Delete' || e.key === 'Backspace') {
-        const target = e.target as HTMLElement | null;
-        if (
-          target &&
-          (target.tagName === 'INPUT' ||
-            target.tagName === 'TEXTAREA' ||
-            target.isContentEditable)
-        ) {
-          return;
-        }
-        const state = useGanttStore.getState();
-        if (state.selectedTaskIds.length > 0) {
+        if (selectedTaskIds.length > 0) {
           e.preventDefault();
-          state.removeTasks(state.selectedTaskIds);
+          state.removeTasks(selectedTaskIds);
         }
+        return;
+      }
+
+      // ── Escape: clear selection ────────────────────────
+      if (e.key === 'Escape') {
+        if (selectedTaskIds.length > 0) {
+          e.preventDefault();
+          state.selectTask(null);
+        }
+        return;
+      }
+
+      // ── Arrow Up / Down: navigate selection ────────────
+      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        if (flatTasks.length === 0) return;
+        e.preventDefault();
+        const lastId = selectedTaskIds[selectedTaskIds.length - 1];
+        const curIdx = lastId ? flatTasks.findIndex((t) => t.id === lastId) : -1;
+        let nextIdx: number;
+        if (e.key === 'ArrowDown') {
+          nextIdx = curIdx < flatTasks.length - 1 ? curIdx + 1 : 0;
+        } else {
+          nextIdx = curIdx > 0 ? curIdx - 1 : flatTasks.length - 1;
+        }
+        const next = flatTasks[nextIdx];
+        if (next) state.selectTask(next.id, { shift: e.shiftKey });
+        return;
+      }
+
+      // ── Enter: open editor on first selected ──────────
+      if (e.key === 'Enter' && selectedTaskIds.length > 0) {
+        e.preventDefault();
+        const task = flatTasks.find((t) => t.id === selectedTaskIds[0]);
+        if (task && onTaskDoubleClick) onTaskDoubleClick(task);
+        return;
+      }
+
+      // ── Space: toggle selection ────────────────────────
+      if (e.key === ' ' && selectedTaskIds.length > 0) {
+        e.preventDefault();
+        const lastId = selectedTaskIds[selectedTaskIds.length - 1];
+        if (lastId) state.selectTask(lastId, { ctrl: true });
+        return;
       }
     }
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [onTaskDoubleClick]);
 
   // ── Render ─────────────────────────────────────────────────
 

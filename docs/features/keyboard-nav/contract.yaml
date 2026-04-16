@@ -1,0 +1,24 @@
+id: keyboard-nav
+kind: behavior
+applies_to: GanttLayout keydown handler
+
+invariants:
+  - when: "ArrowDown is pressed with one task selected"
+    guarantee: "Selection moves to the next task in flatTasks. Wraps to first if at end."
+  - when: "ArrowUp is pressed with one task selected"
+    guarantee: "Selection moves to the previous task. Wraps to last if at start."
+  - when: "Shift+ArrowDown is pressed"
+    guarantee: "Selection extends (range select) via selectTask(..., { shift: true })."
+  - when: "Enter is pressed with selectedTaskIds.length > 0"
+    guarantee: "onTaskDoubleClick fires for the first selected task."
+  - when: "Space is pressed with selectedTaskIds.length > 0"
+    guarantee: "The last selected task is toggled (ctrl-style) in the selection."
+  - when: "Escape is pressed with selectedTaskIds.length > 0"
+    guarantee: "Selection is cleared."
+  - when: "Focus is in an input/textarea/contentEditable"
+    guarantee: "All navigation keys are ignored (except undo/redo)."
+
+depends_on:
+  - bulk-ops
+  - undo-redo
+breaking_changes: []

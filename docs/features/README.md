@@ -38,6 +38,7 @@ Copy [`_template/`](./_template) to start a new feature.
 | [group-headers](./group-headers) | 🟢 | 0.5.2 | presentation |
 | [i18n](./i18n) | 🟢 | 0.2.0 | presentation |
 | [introspection](./introspection) | 🟢 | 0.7.0 | meta |
+| [keyboard-nav](./keyboard-nav) | 🟢 | 0.9.2 | a11y |
 | [query](./query) | 🟢 | 0.8.0 | data |
 | [scheduling](./scheduling) | 🟢 | 0.1.0 | scheduling |
 | [slots](./slots) | 🟢 | 0.3.0 | presentation |
