@@ -1,6 +1,6 @@
 {
   "name": "@bluemillstudio/gantt",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Interactive Gantt chart component for React — drag & drop, dependencies, critical path, auto-scheduling",
   "author": "Blue Mill Studio",
   "license": "MIT",
