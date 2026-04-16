@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-04-16
+
+### Added
+- **CONTRIBUTING.md** with dev setup, scripts, feature-folder template, visual testing, and code conventions.
+- **Provenance badge** in README — links to npm's verified provenance page.
+- **`check:pkg` script** — runs `publint` + `@arethetypeswrong/cli` for export-field validation.
+- **GitHub repo metadata** — description, topics (gantt, react, typescript, critical-path, scheduling, timeline, agent-testable).
+
+### Changed
+- `package.json`: added `"type": "commonjs"` (publint suggestion — prevents Node.js auto-detection overhead).
+- `repository.url` changed to `git+https://...` format per npm conventions.
+- README badges now link to npm/LICENSE pages.
+
 ## [0.9.3] - 2026-04-16
 
 ### Fixed (verified via Playwright screenshots)

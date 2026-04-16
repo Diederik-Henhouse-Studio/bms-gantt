@@ -1,10 +1,11 @@
 # @bluemillstudio/gantt
 
-![version](https://img.shields.io/npm/v/@bluemillstudio/gantt)
-![downloads](https://img.shields.io/npm/dm/@bluemillstudio/gantt)
-![license](https://img.shields.io/badge/license-MIT-green)
+[![npm](https://img.shields.io/npm/v/@bluemillstudio/gantt)](https://www.npmjs.com/package/@bluemillstudio/gantt)
+[![downloads](https://img.shields.io/npm/dm/@bluemillstudio/gantt)](https://www.npmjs.com/package/@bluemillstudio/gantt)
+[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 ![react](https://img.shields.io/badge/react-%E2%89%A518-61dafb)
 ![typescript](https://img.shields.io/badge/typescript-5.x-3178c6)
+[![provenance](https://img.shields.io/badge/provenance-verified-brightgreen)](https://www.npmjs.com/package/@bluemillstudio/gantt)
 
 Interactive Gantt chart component for React with drag & drop, dependencies, critical path analysis, auto-scheduling, and more. Zero Gantt dependencies — built on top of Zustand (state), date-fns (dates) and SVG (dependency arrows).
 

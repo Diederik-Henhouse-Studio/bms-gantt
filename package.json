@@ -1,6 +1,7 @@
 {
   "name": "@bluemillstudio/gantt",
-  "version": "0.9.3",
+  "version": "0.10.0",
+  "type": "commonjs",
   "description": "Interactive Gantt chart component for React — drag & drop, dependencies, critical path, auto-scheduling",
   "author": "Blue Mill Studio",
   "license": "MIT",
@@ -20,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Diederik-Henhouse-Studio/bms-gantt.git"
+    "url": "git+https://github.com/Diederik-Henhouse-Studio/bms-gantt.git"
   },
   "homepage": "https://github.com/Diederik-Henhouse-Studio/bms-gantt#readme",
   "bugs": {
@@ -86,6 +87,7 @@
     "check:contract-coverage": "node scripts/check-contract-coverage.mjs",
     "check:scenarios": "node scripts/check-scenarios.mjs",
     "check:catalog": "node scripts/generate-catalog.mjs --check",
+    "check:pkg": "npx publint && npx @arethetypeswrong/cli --pack .",
     "docs:catalog": "node scripts/generate-catalog.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
