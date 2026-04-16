@@ -189,6 +189,7 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
   const { renderTaskBar, renderTaskTooltip } = useSlots();
   const customContent = renderTaskBar?.(task);
   const isCritical = !!task.critical;
+  const hasSeg = !!(task.segments && task.segments.length > 0);
   const [hovered, setHovered] = useState(false);
 
   const tooltipContent = renderTaskTooltip
@@ -227,8 +228,9 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
       data-gantt-lane={task.$lane ?? undefined}
       data-gantt-group={task.$groupId ?? undefined}
       className={cn(
-        'absolute rounded-sm overflow-hidden select-none',
-        !colors.custom && colors.bg,
+        'absolute rounded-sm select-none',
+        hasSeg ? 'overflow-visible' : 'overflow-hidden',
+        !hasSeg && !colors.custom && colors.bg,
         isSelected && 'ring-2 ring-primary ring-offset-1',
       )}
       style={{
@@ -236,7 +238,7 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         top: task.$y,
         width: task.$w,
         height: task.$h,
-        ...(colors.custom ? { backgroundColor: colors.custom } : {}),
+        ...(!hasSeg && colors.custom ? { backgroundColor: colors.custom } : {}),
         cursor: readonly ? 'default' : 'grab',
         ...(isCritical && !isSelected
           ? {

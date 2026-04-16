@@ -191,7 +191,10 @@ export function TaskBars({ readonly, onTaskClick, onTaskDoubleClick }: TaskBarsP
       <GroupHeaders />
 
       {flatTasks.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground pointer-events-none select-none">
+        <div
+          className="sticky left-0 flex items-center justify-center text-sm pointer-events-none select-none"
+          style={{ width: '50vw', height: 120, color: '#9ca3af', position: 'relative', zIndex: 10 }}
+        >
           {labels.emptyState}
         </div>
       )}
