@@ -23,6 +23,7 @@ jobs:
       - run: npm run check:catalog
       - run: npm run test:coverage
       - run: npm run build
+      - run: npm run check:bundlesize
       - uses: actions/upload-artifact@v4
         with:
           name: coverage

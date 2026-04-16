@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.1] - 2026-04-16
+
+### Added
+- **Bundlesize CI gate** — `npm run check:bundlesize` fails when the packed tarball exceeds 500 KB or unpacked exceeds 2 MB. Wired into CI. Current: 336 KB packed / 1.6 MB unpacked / 32 files.
+- **Tailwind content-path instructions** in README — consumers must add `node_modules/@bluemillstudio/gantt/dist/**/*.{js,mjs}` to their Tailwind `content` config for utility classes to render.
+
 ## [0.10.0] - 2026-04-16
 
 ### Added
