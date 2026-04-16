@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-04-16
+
+### Added
+- **New store exports**: `applyMoveConstraints`, `applyResizeStartConstraints`, `applyResizeEndConstraints` (drag constraints), `applyComputedFields`, `applySummaryAggregators` (computation layer) — all pure functions, useful for SSR/testing.
+- **Agent-testable feature catalog** in `docs/features/`: 16 features × (feature.md + contract.yaml + scenarios.yaml + examples). CI-enforced: `typecheck:examples`, `check:contract-coverage` (95/95), `check:scenarios` (45 specs), `check:catalog`.
+- **Scenario runner** (`tests/features/`): reads scenarios.yaml and executes them as Vitest tests. Covers `unit-call`, `render`, `handle-method`, `keydown`, `hover`, `sequence`. 36/45 executable, 9 skipped (jsdom SVG/Tailwind limitations).
+- **Contract-coverage gate**: CI fails when a new public export has no `contract.yaml` entry and no explicit waiver.
+- **Catalog auto-generator**: `npm run docs:catalog` regenerates the index from frontmatter.
+
+### Changed
+- Total tests: 207 → 252 (243 pass + 9 skip).
+- Calendar `createCalendar` documented with its actual positional-arg signature.
+- `yaml` added as devDependency for the scenario runner.
+
 ## [0.8.0] - 2026-04-15
 
 ### Added — Computation layer
