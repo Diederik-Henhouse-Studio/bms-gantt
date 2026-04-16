@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useRef, useMemo, useEffect } from 'react';
 import { Gantt, type GanttHandle } from '@bluemillstudio/gantt';
 import { SCENARIOS } from './scenarios';
 
@@ -12,8 +12,16 @@ export function ScenarioRouter() {
     [scenarioId],
   );
 
-  // Expose handle globally so Playwright and Crawl4AI can call it.
-  (window as any).__gantt = handle.current;
+  // Expose handle globally after mount so Playwright/Crawl4AI can call it.
+  useEffect(() => {
+    const id = setInterval(() => {
+      if (handle.current) {
+        (window as any).__gantt = handle.current;
+        clearInterval(id);
+      }
+    }, 50);
+    return () => clearInterval(id);
+  }, [scenarioId]);
 
   // Index page: list all scenarios as links.
   if (!scenario) {

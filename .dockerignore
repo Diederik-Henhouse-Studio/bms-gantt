@@ -1,0 +1,14 @@
+node_modules
+dist
+coverage
+.git
+example/node_modules
+example/dist
+testing/node_modules
+testing/app/node_modules
+testing/app/dist
+testing/screenshots
+testing/crawl4ai/report.json
+*.tgz
+.env
+.env.local
