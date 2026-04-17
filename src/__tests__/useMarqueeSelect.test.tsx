@@ -159,4 +159,49 @@ describe('getTasksInMarquee', () => {
 
     expect(useGanttStore.getState().selectedTaskIds).toEqual(['existing']);
   });
+
+  it('preserves selection when a tiny empty-space drag captures no tasks', () => {
+    // Regression: a fat-finger 9px drag used to wipe selection by calling
+    // selectTasks([]). The rect area guard now prevents that.
+    useGanttStore.setState({
+      flatTasks: [createTask({ id: 'far', $x: 500, $y: 500, $w: 10, $h: 10 })],
+      selectedTaskIds: ['keep-me'],
+    });
+
+    render(<MarqueeHarness />);
+    mockScrollBounds();
+
+    fireEvent.mouseDown(screen.getByTestId('content'), {
+      button: 0,
+      clientX: 20,
+      clientY: 30,
+    });
+    // Just barely clears DRAG_THRESHOLD (8px) but rect area ≈ 100 < MIN_CLEAR_AREA (400)
+    fireEvent.mouseMove(document, { clientX: 30, clientY: 40 });
+    fireEvent.mouseUp(document, { clientX: 30, clientY: 40 });
+
+    expect(useGanttStore.getState().selectedTaskIds).toEqual(['keep-me']);
+  });
+
+  it('cancels the marquee on window blur', () => {
+    useGanttStore.setState({
+      flatTasks: [createTask({ id: 'hit', $x: 15, $y: 15, $w: 10, $h: 10 })],
+      selectedTaskIds: ['existing'],
+    });
+
+    render(<MarqueeHarness />);
+    mockScrollBounds();
+
+    fireEvent.mouseDown(screen.getByTestId('content'), {
+      button: 0,
+      clientX: 20,
+      clientY: 30,
+    });
+    fireEvent.mouseMove(document, { clientX: 80, clientY: 80 });
+    // Window loses focus (user alt-tabs); selection must remain untouched.
+    fireEvent.blur(window);
+    fireEvent.mouseUp(document, { clientX: 80, clientY: 80 });
+
+    expect(useGanttStore.getState().selectedTaskIds).toEqual(['existing']);
+  });
 });

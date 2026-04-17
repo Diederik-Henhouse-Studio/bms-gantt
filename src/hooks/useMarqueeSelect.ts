@@ -34,7 +34,14 @@ export interface UseMarqueeSelectReturn {
   handleMarqueeMouseDown: (e: React.MouseEvent) => void;
 }
 
-const DRAG_THRESHOLD = 3;
+/** Minimum pixel movement before a click becomes a marquee drag. */
+const DRAG_THRESHOLD = 8;
+/**
+ * Minimum marquee rect area (px²) that may replace an existing non-empty
+ * selection with an empty result. Protects against fat-finger clicks that
+ * barely clear DRAG_THRESHOLD but capture no tasks.
+ */
+const MIN_CLEAR_AREA = 400;
 
 function rectFromPoints(start: Point, end: Point): MarqueeRect {
   const left = Math.min(start.x, end.x);
@@ -128,6 +135,7 @@ export function useMarqueeSelect({
     onMouseMove: (e: MouseEvent) => void;
     onMouseUp: (e: MouseEvent) => void;
     onKeyDown: (e: KeyboardEvent) => void;
+    onCancel: (e: Event) => void;
   } | null>(null);
 
   const finish = useCallback((applySelection: boolean, endPoint?: Point) => {
@@ -145,6 +153,15 @@ export function useMarqueeSelect({
     const store = useGanttStore.getState();
     const ids = getTasksInMarquee(store.flatTasks, rect);
 
+    // Guard against accidentally clearing a non-empty selection with a tiny
+    // non-additive drag that happened to capture no tasks.
+    const wouldClear =
+      !additiveRef.current &&
+      ids.length === 0 &&
+      initialSelectionRef.current.length > 0;
+    const area = rect.width * rect.height;
+    if (wouldClear && area < MIN_CLEAR_AREA) return;
+
     store.selectTasks(
       additiveRef.current ? mergeIds(initialSelectionRef.current, ids) : ids,
     );
@@ -157,6 +174,9 @@ export function useMarqueeSelect({
     document.removeEventListener('mousemove', listeners.onMouseMove);
     document.removeEventListener('mouseup', listeners.onMouseUp);
     document.removeEventListener('keydown', listeners.onKeyDown);
+    document.removeEventListener('pointercancel', listeners.onCancel as EventListener);
+    document.removeEventListener('visibilitychange', listeners.onCancel as EventListener);
+    window.removeEventListener('blur', listeners.onCancel);
     listenersRef.current = null;
   }, []);
 
@@ -204,10 +224,22 @@ export function useMarqueeSelect({
         finish(false);
       };
 
+      // Cancel the marquee on any event that implies the pointer gesture
+      // cannot complete normally (tab switch, window blur, pointer capture
+      // loss). Without these the marquee can visually hang until the next
+      // click.
+      const onCancel = () => {
+        removeListeners();
+        finish(false);
+      };
+
       document.addEventListener('mousemove', onMouseMove);
       document.addEventListener('mouseup', onMouseUp);
       document.addEventListener('keydown', onKeyDown);
-      listenersRef.current = { onMouseMove, onMouseUp, onKeyDown };
+      document.addEventListener('pointercancel', onCancel);
+      document.addEventListener('visibilitychange', onCancel);
+      window.addEventListener('blur', onCancel);
+      listenersRef.current = { onMouseMove, onMouseUp, onKeyDown, onCancel };
     },
     [finish, removeListeners, scrollContainerRef, totalHeight, totalWidth],
   );
