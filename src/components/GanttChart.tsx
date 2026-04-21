@@ -13,6 +13,7 @@ import { CellGrid } from './CellGrid';
 import { Markers } from './Markers';
 import { DependencyLinks } from './DependencyLinks';
 import { TaskBars } from './TaskBars';
+import { useMarqueeSelect } from '../hooks/useMarqueeSelect';
 
 // ── Zoom level ordering (coarse → fine) ──────────────────────
 
@@ -57,6 +58,15 @@ export function GanttChart({
   const zoomLevel = useGanttStore((s) => s.zoomLevel);
   const setScroll = useGanttStore((s) => s.setScroll);
   const setZoom = useGanttStore((s) => s.setZoom);
+  const {
+    marqueeRect,
+    isMarqueeSelecting,
+    handleMarqueeMouseDown,
+  } = useMarqueeSelect({
+    scrollContainerRef,
+    totalWidth,
+    totalHeight,
+  });
 
   // ── Scroll sync ─────────────────────────────────────────────
 
@@ -102,7 +112,7 @@ export function GanttChart({
     [zoomLevel, setZoom],
   );
 
-  // ── Grab-scroll (middle-click or Shift+drag) ───────────────
+  // ── Grab-scroll (middle-click) ─────────────────────────────
 
   const isGrabScrolling = useRef(false);
   const grabPointer = useRef<{ element: Element; pointerId: number } | null>(null);
@@ -112,11 +122,8 @@ export function GanttChart({
   const handleGrabStart = useCallback(
     (e: React.PointerEvent) => {
       if (!e.isPrimary) return;
-
-      // Middle-click or Shift+left-click
-      const isMiddle = e.button === 1;
-      const isShiftLeft = e.button === 0 && e.shiftKey;
-      if (!isMiddle && !isShiftLeft) return;
+      // Middle-click only — Shift+left is reserved for additive marquee select.
+      if (e.button !== 1) return;
 
       const el = scrollContainerRef.current;
       if (!el) return;
@@ -224,9 +231,10 @@ export function GanttChart({
         ref={scrollContainerRef}
         onScroll={handleScroll}
         onPointerDown={handleGrabStart}
-        style={shiftHeld ? { cursor: 'grab' } : undefined}
+        style={shiftHeld ? { cursor: 'crosshair' } : undefined}
       >
         <div
+          onMouseDown={handleMarqueeMouseDown}
           style={{
             width: totalWidth,
             height: totalHeight,
@@ -242,6 +250,21 @@ export function GanttChart({
           <Markers />
           <DependencyLinks />
           <TaskBars readonly={config.readonly} />
+
+          {marqueeRect && (
+            <div
+              aria-hidden="true"
+              data-gantt-role="marquee-selection"
+              className="absolute pointer-events-none z-[60] border border-primary bg-primary/15"
+              style={{
+                left: marqueeRect.left,
+                top: marqueeRect.top,
+                width: marqueeRect.width,
+                height: marqueeRect.height,
+                display: isMarqueeSelecting ? undefined : 'none',
+              }}
+            />
+          )}
         </div>
       </div>
     </div>

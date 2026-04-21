@@ -11,3 +11,10 @@ export type {
   UseVirtualScrollOptions,
   UseVirtualScrollReturn,
 } from './useVirtualScroll';
+
+export { getTasksInMarquee, useMarqueeSelect } from './useMarqueeSelect';
+export type {
+  MarqueeRect,
+  UseMarqueeSelectOptions,
+  UseMarqueeSelectReturn,
+} from './useMarqueeSelect';
