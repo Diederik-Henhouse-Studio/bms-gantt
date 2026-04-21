@@ -159,15 +159,26 @@ export function TaskBars({ readonly, onTaskClick, onTaskDoubleClick }: TaskBarsP
       releasePointerCapture();
     };
 
+    const handleWindowCancel = () => {
+      if (!isDragging.current) return;
+      isDragging.current = false;
+      useGanttStore.getState().endDrag(true);
+      releasePointerCapture();
+    };
+
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerup', handlePointerEnd);
     window.addEventListener('pointercancel', handlePointerEnd);
+    document.addEventListener('visibilitychange', handleWindowCancel);
+    window.addEventListener('blur', handleWindowCancel);
 
     return () => {
       releasePointerCapture();
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerup', handlePointerEnd);
       window.removeEventListener('pointercancel', handlePointerEnd);
+      document.removeEventListener('visibilitychange', handleWindowCancel);
+      window.removeEventListener('blur', handleWindowCancel);
     };
   }, []);
 

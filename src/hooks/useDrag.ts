@@ -48,6 +48,7 @@ export function useDrag({ readonly, onTaskUpdate }: UseDragOptions): UseDragRetu
     onPointerMove: (e: PointerEvent) => void;
     onPointerUp: (e: PointerEvent) => void;
     onPointerCancel: (e: PointerEvent) => void;
+    onWindowCancel: () => void;
   } | null>(null);
   const capturedPointerRef = useRef<{
     element: Element;
@@ -61,6 +62,8 @@ export function useDrag({ readonly, onTaskUpdate }: UseDragOptions): UseDragRetu
       document.removeEventListener('pointermove', listenersRef.current.onPointerMove);
       document.removeEventListener('pointerup', listenersRef.current.onPointerUp);
       document.removeEventListener('pointercancel', listenersRef.current.onPointerCancel);
+      document.removeEventListener('visibilitychange', listenersRef.current.onWindowCancel);
+      window.removeEventListener('blur', listenersRef.current.onWindowCancel);
       listenersRef.current = null;
     }
   }, []);
@@ -153,14 +156,30 @@ export function useDrag({ readonly, onTaskUpdate }: UseDragOptions): UseDragRetu
         removeListeners();
       };
 
+      // Treat window blur / tab switch as a cancellation: without this the
+      // drag state can hang when the user alt-tabs or the mobile app switcher
+      // eats the pointerup event.
+      const onWindowCancel = () => {
+        const currentStore = useGanttStore.getState();
+        currentStore.endDrag(true); // cancelled
+        setIsDragging(false);
+        setDragType(null);
+        originalTaskRef.current = null;
+        releasePointerCapture();
+        removeListeners();
+      };
+
       // Attach global listeners.
       document.addEventListener('pointermove', onPointerMove);
       document.addEventListener('pointerup', finishDrag);
       document.addEventListener('pointercancel', finishDrag);
+      document.addEventListener('visibilitychange', onWindowCancel);
+      window.addEventListener('blur', onWindowCancel);
       listenersRef.current = {
         onPointerMove,
         onPointerUp: finishDrag,
         onPointerCancel: finishDrag,
+        onWindowCancel,
       };
     },
     [readonly, releasePointerCapture, removeListeners],

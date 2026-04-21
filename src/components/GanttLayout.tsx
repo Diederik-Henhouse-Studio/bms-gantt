@@ -132,15 +132,27 @@ export function GanttLayout({
       releasePointerCapture();
     }
 
+    function handleWindowCancel() {
+      if (!isDragging.current) return;
+      isDragging.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+      releasePointerCapture();
+    }
+
     document.addEventListener('pointermove', handlePointerMove);
     document.addEventListener('pointerup', handleEnd);
     document.addEventListener('pointercancel', handleEnd);
+    document.addEventListener('visibilitychange', handleWindowCancel);
+    window.addEventListener('blur', handleWindowCancel);
 
     return () => {
       releasePointerCapture();
       document.removeEventListener('pointermove', handlePointerMove);
       document.removeEventListener('pointerup', handleEnd);
       document.removeEventListener('pointercancel', handleEnd);
+      document.removeEventListener('visibilitychange', handleWindowCancel);
+      window.removeEventListener('blur', handleWindowCancel);
     };
   }, []);
 

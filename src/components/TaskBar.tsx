@@ -79,6 +79,7 @@ function MilestoneBar({ task, isSelected, readonly, onSelect, onDoubleClick, onD
         top: task.$y + (task.$h - size) / 2,
         width: size,
         height: size,
+        touchAction: readonly ? undefined : 'none',
       }}
       onClick={(e) => onSelect(task.id, e)}
       onDoubleClick={() => onDoubleClick(task.id)}
@@ -124,6 +125,7 @@ function SummaryBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         top: task.$y + (task.$h - barHeight) / 2,
         width: task.$w,
         height: barHeight + triangleSize,
+        touchAction: readonly ? undefined : 'none',
       }}
       onClick={(e) => onSelect(task.id, e)}
       onDoubleClick={() => onDoubleClick(task.id)}
@@ -238,6 +240,7 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         top: task.$y,
         width: task.$w,
         height: task.$h,
+        touchAction: readonly ? undefined : 'none',
         ...(!hasSeg && colors.custom ? { backgroundColor: colors.custom } : {}),
         cursor: readonly ? 'default' : 'grab',
         ...(isCritical && !isSelected
