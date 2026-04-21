@@ -38,6 +38,10 @@ export function TaskBars({ readonly, onTaskClick, onTaskDoubleClick }: TaskBarsP
 
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
+  const capturedPointerRef = useRef<{
+    element: Element;
+    pointerId: number;
+  } | null>(null);
 
   // ── Virtual scrolling: determine visible tasks ───────────────
 
@@ -88,17 +92,31 @@ export function TaskBars({ readonly, onTaskClick, onTaskDoubleClick }: TaskBarsP
 
   const handleDragStart = useCallback(
     (
-      e: React.MouseEvent,
+      e: React.PointerEvent,
       taskId: string,
       type: 'move' | 'resize-start' | 'resize-end' | 'progress',
     ) => {
       if (readonly) return;
+      if (!e.isPrimary) return;
+      if (e.button !== 0) return;
 
       e.preventDefault();
       e.stopPropagation();
 
+      e.currentTarget.setPointerCapture(e.pointerId);
+      capturedPointerRef.current = {
+        element: e.currentTarget,
+        pointerId: e.pointerId,
+      };
+
       const task = taskMap.current.get(taskId);
-      if (!task) return;
+      if (!task) {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        }
+        capturedPointerRef.current = null;
+        return;
+      }
 
       const drag: DragState = {
         type,
@@ -116,26 +134,51 @@ export function TaskBars({ readonly, onTaskClick, onTaskDoubleClick }: TaskBarsP
     [readonly],
   );
 
-  // ── Global mouse listeners for drag ──────────────────────────
+  // ── Global pointer listeners for drag ────────────────────────
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const releasePointerCapture = () => {
+      const captured = capturedPointerRef.current;
+      if (captured && captured.element.hasPointerCapture?.(captured.pointerId)) {
+        captured.element.releasePointerCapture(captured.pointerId);
+      }
+      capturedPointerRef.current = null;
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
       if (!isDragging.current) return;
+      if (e.pointerId !== capturedPointerRef.current?.pointerId) return;
       useGanttStore.getState().updateDrag(e.clientX, e.clientY);
     };
 
-    const handleMouseUp = () => {
+    const handlePointerEnd = (e: PointerEvent) => {
       if (!isDragging.current) return;
+      if (e.pointerId !== capturedPointerRef.current?.pointerId) return;
       isDragging.current = false;
       useGanttStore.getState().endDrag();
+      releasePointerCapture();
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
+    const handleWindowCancel = () => {
+      if (!isDragging.current) return;
+      isDragging.current = false;
+      useGanttStore.getState().endDrag(true);
+      releasePointerCapture();
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerEnd);
+    window.addEventListener('pointercancel', handlePointerEnd);
+    document.addEventListener('visibilitychange', handleWindowCancel);
+    window.addEventListener('blur', handleWindowCancel);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      releasePointerCapture();
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerEnd);
+      window.removeEventListener('pointercancel', handlePointerEnd);
+      document.removeEventListener('visibilitychange', handleWindowCancel);
+      window.removeEventListener('blur', handleWindowCancel);
     };
   }, []);
 

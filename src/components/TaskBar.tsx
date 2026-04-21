@@ -30,7 +30,7 @@ export interface TaskBarProps {
   onSelect: (taskId: string, e?: React.MouseEvent) => void;
   onDoubleClick: (taskId: string) => void;
   onDragStart: (
-    e: React.MouseEvent,
+    e: React.PointerEvent,
     taskId: string,
     type: 'move' | 'resize-start' | 'resize-end' | 'progress',
   ) => void;
@@ -79,10 +79,11 @@ function MilestoneBar({ task, isSelected, readonly, onSelect, onDoubleClick, onD
         top: task.$y + (task.$h - size) / 2,
         width: size,
         height: size,
+        touchAction: readonly ? undefined : 'none',
       }}
       onClick={(e) => onSelect(task.id, e)}
       onDoubleClick={() => onDoubleClick(task.id)}
-      onMouseDown={!readonly ? (e) => onDragStart(e, task.id, 'move') : undefined}
+      onPointerDown={!readonly ? (e) => onDragStart(e, task.id, 'move') : undefined}
     >
       <div
         className={cn(
@@ -124,10 +125,11 @@ function SummaryBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         top: task.$y + (task.$h - barHeight) / 2,
         width: task.$w,
         height: barHeight + triangleSize,
+        touchAction: readonly ? undefined : 'none',
       }}
       onClick={(e) => onSelect(task.id, e)}
       onDoubleClick={() => onDoubleClick(task.id)}
-      onMouseDown={!readonly ? (e) => onDragStart(e, task.id, 'move') : undefined}
+      onPointerDown={!readonly ? (e) => onDragStart(e, task.id, 'move') : undefined}
     >
       {/* Main bar */}
       <div
@@ -238,6 +240,7 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
         top: task.$y,
         width: task.$w,
         height: task.$h,
+        touchAction: readonly ? undefined : 'none',
         ...(!hasSeg && colors.custom ? { backgroundColor: colors.custom } : {}),
         cursor: readonly ? 'default' : 'grab',
         ...(isCritical && !isSelected
@@ -252,7 +255,7 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
       onMouseLeave={() => setHovered(false)}
       onClick={(e) => onSelect(task.id, e)}
       onDoubleClick={() => onDoubleClick(task.id)}
-      onMouseDown={!readonly ? (e) => {
+      onPointerDown={!readonly ? (e) => {
         // Only trigger move if not on a resize handle
         const target = e.target as HTMLElement;
         if (!target.dataset.handle) {
@@ -335,7 +338,7 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
           <div
             data-handle="resize-start"
             className="absolute inset-y-0 left-0 w-1 cursor-ew-resize z-20"
-            onMouseDown={(e) => {
+            onPointerDown={(e) => {
               e.stopPropagation();
               onDragStart(e, task.id, 'resize-start');
             }}
@@ -343,7 +346,7 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
           <div
             data-handle="resize-end"
             className="absolute inset-y-0 right-0 w-1 cursor-ew-resize z-20"
-            onMouseDown={(e) => {
+            onPointerDown={(e) => {
               e.stopPropagation();
               onDragStart(e, task.id, 'resize-end');
             }}
@@ -358,7 +361,7 @@ function RegularBar({ task, isSelected, readonly, onSelect, onDoubleClick, onDra
               bottom: -4,
               transform: 'translateX(-50%)',
             }}
-            onMouseDown={(e) => {
+            onPointerDown={(e) => {
               e.stopPropagation();
               onDragStart(e, task.id, 'progress');
             }}
