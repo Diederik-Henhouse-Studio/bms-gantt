@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-04-21
+
+### Added
+- **Marquee (rubber-band) select** (#8) — drag-select task bars by dragging over empty chart space. `Shift+drag` extends the existing selection additively. `Escape` cancels. New `useMarqueeSelect` hook exported for advanced use.
+- **Pointer Events migration** (#11) — all drag interactions (task bar, grid divider) now use Pointer Events instead of Mouse Events. Unlocks touch support on iPad/tablet and handles pointer-capture loss gracefully.
+
+### Fixed
+- **Drag gestures never hang** — `useDrag`, `TaskBars`, `GanttLayout` divider, and the marquee hook all cancel the in-flight drag on `window.blur`, `document.visibilitychange`, and `pointercancel`.
+- **Tiny empty-drag no longer wipes selection** — marquee requires 8-px movement + 400 px² rect area before replacing a non-empty selection.
+- **Touch scroll no longer interferes with drag** — `touch-action: none` on task bars so mobile browsers hand the pointer gesture to us.
+
+### Changed
+- `Shift+drag` on the chart background now means "additive marquee select". Middle-click still grabs to pan; no pan gesture is removed.
+- `TaskBarProps.onDragStart` parameter type: `React.MouseEvent` → `React.PointerEvent`.
+
+### Contributors
+- Thanks to @xyaz1313 for PR #33 — closed as superseded by v0.5.0's forwardRef wrap.
+
+### Tests: 256 → 264.
+
 ## [0.10.1] - 2026-04-16
 
 ### Added
