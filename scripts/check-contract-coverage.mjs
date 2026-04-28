@@ -88,10 +88,10 @@ function collectDocumented(yamlFiles) {
 const WAIVERS = new Set([
   'default',
 
-  // ── Example preset (Grondwijzer) — lives in src/presets/examples/, kept
+  // ── Example preset (Moonbase) — lives in src/presets/examples/, kept
   //    as reference, not part of the library's core API surface.
-  'GRONDWIJZER_GANTT_CONFIG',
-  'GrondwijzerProject',
+  'MOONBASE_GANTT_CONFIG',
+  'MoonbaseProject',
   'NL_HOLIDAYS_2026',
   'ProjectGanttData',
   'TASK_CATEGORY_COLORS',

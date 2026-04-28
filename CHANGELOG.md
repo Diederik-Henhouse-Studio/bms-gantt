@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-04-28
+
+### Changed
+- **Renamed example preset from "Grondwijzer" to "Moonbase"** — the preset is meant as a fictional example of domain-specific integration. The previous name referenced the project this library was originally extracted from. New file: `src/presets/examples/moonbase.ts`. New exports: `MoonbaseProject`, `MOONBASE_GANTT_CONFIG`. (`NL_HOLIDAYS_2026`, `TASK_CATEGORY_COLORS`, `TASK_STATUS_COLORS`, `createProjectGanttData`, `ProjectGanttData` keep their names.)
+
+### Migration
+If you imported `GrondwijzerProject` or `GRONDWIJZER_GANTT_CONFIG`, rename to `MoonbaseProject` / `MOONBASE_GANTT_CONFIG`. Most consumers don't import these — they're example code, not core API.
+
 ## [0.11.0] - 2026-04-21
 
 ### Added
