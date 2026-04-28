@@ -309,14 +309,14 @@ The toolbar includes a built-in `ExportButton`. It exports the full chart (inclu
 
 ## Example Integration
 
-The [`src/presets/examples/grondwijzer.ts`](src/presets/examples/grondwijzer.ts) module is kept in the package as a worked example of a **domain-specific integration**. It shows one way to:
+The [`src/presets/examples/moonbase.ts`](src/presets/examples/moonbase.ts) module is kept in the package as a worked example of a **domain-specific integration** (using a fictional moonbase-construction project). It shows one way to:
 
 - Define a category-to-colour mapping (`TASK_CATEGORY_COLORS`)
 - Define a status-to-colour mapping (`TASK_STATUS_COLORS`)
 - Convert a domain object into `{ tasks, links, markers }` via `createProjectGanttData()`
 - Provide a default `GanttConfig` and a holidays array
 
-You are not expected to use the Grondwijzer preset directly — copy it into your own app and adapt it to your domain.
+You are not expected to use the Moonbase preset directly — copy it into your own app and adapt it to your domain.
 
 ## Customisation slots
 
@@ -594,7 +594,7 @@ src/
 ├── presets/           Domain-specific configuration
 │   ├── index.ts           Re-exports
 │   └── examples/
-│       └── grondwijzer.ts  Example: soil-flow/logistics domain
+│       └── moonbase.ts     Example: fictional moonbase-construction domain
 └── utils/             Helpers
 ```
 

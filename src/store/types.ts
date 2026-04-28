@@ -14,7 +14,7 @@ export type TaskType = 'task' | 'summary' | 'milestone';
 /**
  * Optional task category for domain-specific colouring.
  * The default literals are retained as an example of how a consumer
- * can model their own task taxonomy; see `presets/examples/grondwijzer.ts`.
+ * can model their own task taxonomy; see `presets/examples/moonbase.ts`.
  */
 export type TaskCategory =
   | 'f1'

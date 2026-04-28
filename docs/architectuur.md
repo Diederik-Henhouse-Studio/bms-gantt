@@ -5,7 +5,7 @@
 Een eigen Gantt component bouwen, geïnspireerd op SVAR React Gantt (MIT), maar:
 - Volledig eigen code (geen @svar-ui/* dependencies)
 - Gebouwd op ons bestaande stack: React 18, Shadcn UI, Tailwind, Zustand
-- Specifiek voor het Grondwijzer domein (projectfasering, F1/F2/F3, grondstromen)
+- Specifiek voor het Moonbase domein (projectfasering, F1/F2/F3, grondstromen)
 
 ## Referentiecode
 
@@ -201,7 +201,7 @@ components/gantt/
 4. Undo/redo in Zustand (temporal middleware)
 5. PDF export (html2canvas + jsPDF)
 
-### Fase 6: Grondwijzer integratie (week 4)
+### Fase 6: Moonbase integratie (week 4)
 
 1. Taaktypes: F1, F2, F3, Transport, Inspectie, Order
 2. Kleurschema per type/status

@@ -7,12 +7,12 @@
 export {
   TASK_CATEGORY_COLORS,
   TASK_STATUS_COLORS,
-  GRONDWIJZER_GANTT_CONFIG,
+  MOONBASE_GANTT_CONFIG,
   NL_HOLIDAYS_2026,
   createProjectGanttData,
-} from './examples/grondwijzer';
+} from './examples/moonbase';
 
 export type {
-  GrondwijzerProject,
+  MoonbaseProject,
   ProjectGanttData,
-} from './examples/grondwijzer';
+} from './examples/moonbase';

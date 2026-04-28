@@ -25,7 +25,7 @@ export const TASK_CATEGORY_COLORS: Record<TaskCategory, string> = {
   generic: '#6366f1',    // indigo-500
 };
 
-/** Bar colour per Grondwijzer task status. */
+/** Bar colour per Moonbase task status. */
 export const TASK_STATUS_COLORS: Record<string, string> = {
   concept: '#9ca3af',        // gray-400
   ingediend: '#3b82f6',      // blue-500
@@ -37,10 +37,10 @@ export const TASK_STATUS_COLORS: Record<string, string> = {
   vertraagd: '#ef4444',      // red-500
 };
 
-// ━━━ Grondwijzer project interface ━━━━━━━━━━━━━━━━━━━━━━━━━
+// ━━━ Moonbase project interface ━━━━━━━━━━━━━━━━━━━━━━━━━
 
-/** Grondwijzer project as received from the domain layer. */
-export interface GrondwijzerProject {
+/** Moonbase project as received from the domain layer. */
+export interface MoonbaseProject {
   id: string;
   naam: string;
   projectnr: string;
@@ -116,7 +116,7 @@ export interface ProjectGanttData {
 }
 
 /**
- * Convert a Grondwijzer project into Gantt tasks, links, and markers.
+ * Convert a Moonbase project into Gantt tasks, links, and markers.
  *
  * Generated structure:
  * - Summary task for the project
@@ -129,7 +129,7 @@ export interface ProjectGanttData {
  * - Markers: BKV-afgiftedatum, project deadline
  */
 export function createProjectGanttData(
-  project: GrondwijzerProject,
+  project: MoonbaseProject,
 ): ProjectGanttData {
   const tasks: GanttTask[] = [];
   const links: GanttLink[] = [];
@@ -333,8 +333,8 @@ export function createProjectGanttData(
 
 // ━━━ Default config ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-/** Default Gantt configuration for Grondwijzer instances. */
-export const GRONDWIJZER_GANTT_CONFIG: Partial<GanttConfig> = {
+/** Default Gantt configuration for Moonbase instances. */
+export const MOONBASE_GANTT_CONFIG: Partial<GanttConfig> = {
   cellHeight: 36,
   barHeight: 24,
   barPadding: 6,
